@@ -1,7 +1,6 @@
 <?php
-$action = isset($_GET['action']) && is_string($_GET['action'])
-    ? $_GET['action']
-    : 'login';
+$action = isset($_GET['action']) && is_string($_GET['action']) ? $_GET['action'] : 'login';
+
 $inscriptionReussie = isset($_SESSION['message_inscription']);
 
 if ($inscriptionReussie) {
@@ -12,7 +11,6 @@ switch ($action) {
     case 'register':
 $erreurs = [];
 $donnees = [
-    'identifiant' => '',
     'nom' => '',
     'prenom' => '',
     'email' => '',
@@ -38,9 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erreurs[] = 'Le formulaire a expiré. Veuillez le soumettre à nouveau.';
     }
 
-    if ($donnees['identifiant'] === '' || strlen($donnees['identifiant']) > 100) {
-        $erreurs[] = 'L’identifiant est obligatoire et ne doit pas dépasser 100 caractères.';
-    }
     if ($donnees['nom'] === '' || strlen($donnees['nom']) > 100) {
         $erreurs[] = 'Le nom est obligatoire et ne doit pas dépasser 100 caractères.';
     }

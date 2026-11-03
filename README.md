@@ -11,3 +11,7 @@ avoir les droits de lecture et d'écriture sur cette base.
 
 Les nouveaux mots de passe sont stockés avec `password_hash()`. L'authentification devra
 les vérifier avec `password_verify()`.
+
+L'identifiant est généré à partir de la première lettre du nom suivie des six premières
+lettres du prénom, en majuscules. Si cet identifiant existe déjà, un numéro est ajouté pour
+le rendre unique.

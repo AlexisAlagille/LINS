@@ -24,13 +24,13 @@
 
             <form method="post" action="index.php?uc=auth&amp;action=login" class="formulaire-inscription">
                 <div class="champ">
-                    <label for="identifiant">Identifiant</label>
+                    <label for="email">Adresse email</label>
                     <input
-                        id="identifiant"
-                        name="identifiant"
-                        type="text"
-                        maxlength="100"
-                        autocomplete="username"
+                        id="email"
+                        name="email"
+                        type="email"
+                        maxlength="255"
+                        autocomplete="email"
                         required
                     >
                 </div>

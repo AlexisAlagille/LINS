@@ -1,6 +1,22 @@
 <?php
 function creerUtilisateur(PDO $bdd, array $donnees, string $motDePasse): void
 {
+    $nomAscii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $donnees['nom']);
+    $prenomAscii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $donnees['prenom']);
+
+    if ($nomAscii === false || $prenomAscii === false) {
+        throw new RuntimeException('Impossible de générer un identifiant à partir du nom et du prénom.');
+    }
+
+    $lettresNom = preg_replace('/[^A-Za-z]/', '', $nomAscii) ?? '';
+    $lettresPrenom = preg_replace('/[^A-Za-z]/', '', $prenomAscii) ?? '';
+
+    if ($lettresNom === '' || $lettresPrenom === '') {
+        throw new InvalidArgumentException('Le nom et le prénom doivent contenir des lettres pour générer l’identifiant.');
+    }
+
+    $identifiantBase = strtoupper(substr($lettresNom, 0, 1) . substr($lettresPrenom, 0, 6));
+
     $role = $bdd->prepare('SELECT id FROM role WHERE libelle = ?');
     $role->execute(['client']);
     $idRole = $role->fetchColumn();
@@ -9,21 +25,31 @@ function creerUtilisateur(PDO $bdd, array $donnees, string $motDePasse): void
         throw new RuntimeException('Le rôle client est absent de la base de données.');
     }
 
-    $recherche = $bdd->prepare(
-        'SELECT id FROM user WHERE identifiant = ? OR email = ? LIMIT 1'
-    );
-    $recherche->execute([$donnees['identifiant'], $donnees['email']]);
+    $rechercheEmail = $bdd->prepare('SELECT id FROM user WHERE email = ? LIMIT 1');
+    $rechercheEmail->execute([$donnees['email']]);
 
-    if ($recherche->fetchColumn() !== false) {
-        throw new InvalidArgumentException('Cet identifiant ou cette adresse email est déjà utilisé.');
+    if ($rechercheEmail->fetchColumn() !== false) {
+        throw new InvalidArgumentException('Cette adresse email est déjà utilisée.');
     }
+
+    $rechercheIdentifiant = $bdd->prepare('SELECT id FROM user WHERE identifiant = ? LIMIT 1');
+    $identifiant = $identifiantBase;
+    $suffixe = 1;
+
+    do {
+        $rechercheIdentifiant->execute([$identifiant]);
+        $identifiantExistant = $rechercheIdentifiant->fetchColumn() !== false;
+        if ($identifiantExistant) {
+            $identifiant = $identifiantBase . ++$suffixe;
+        }
+    } while ($identifiantExistant);
 
     $insertion = $bdd->prepare(
         'INSERT INTO user (identifiant, password, nom, prenom, email, id_role)
          VALUES (?, ?, ?, ?, ?, ?)'
     );
     $insertion->execute([
-        $donnees['identifiant'],
+        $identifiant,
         password_hash($motDePasse, PASSWORD_DEFAULT),
         $donnees['nom'],
         $donnees['prenom'],

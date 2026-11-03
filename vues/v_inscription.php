@@ -1,5 +1,5 @@
 <?php
-/** @var array{identifiant: string, nom: string, prenom: string, email: string} $donnees */
+/** @var array{nom: string, prenom: string, email: string} $donnees */
 /** @var list<string> $erreurs */
 /** @var bool $inscriptionReussie */
 $echapper = static function (string $valeur): string {
@@ -72,19 +72,6 @@ $echapper = static function (string $valeur): string {
                             required
                         >
                     </div>
-                </div>
-
-                <div class="champ">
-                    <label for="identifiant">Identifiant</label>
-                    <input
-                        id="identifiant"
-                        name="identifiant"
-                        type="text"
-                        maxlength="100"
-                        autocomplete="username"
-                        value="<?= $echapper($donnees['identifiant']) ?>"
-                        required
-                    >
                 </div>
 
                 <div class="champ">
