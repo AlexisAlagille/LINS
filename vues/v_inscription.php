@@ -15,6 +15,7 @@ $echapper = static function (string $valeur): string {
     <link rel="stylesheet" href="includes/css/style.css">
 </head>
 <body>
+    <?php require __DIR__ . '/v_header.php'; ?>
     <main class="inscription">
         <section class="carte-inscription" aria-labelledby="titre-inscription">
             <header class="entete-inscription">

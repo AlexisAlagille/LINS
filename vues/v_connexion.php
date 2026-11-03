@@ -14,7 +14,8 @@ $echapper = static function (string $valeur): string {
 	<title>Connexion | LINS</title>
 	<link rel="stylesheet" href="includes/css/style.css">
 </head>
-<body>
+<body class="page-connexion">
+	<?php require __DIR__ . '/v_header.php'; ?>
 	<main class="inscription">
 		<section class="carte-inscription" aria-labelledby="titre-connexion">
 			<header class="entete-inscription">
