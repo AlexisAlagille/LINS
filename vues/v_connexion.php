@@ -1,70 +1,71 @@
-<?php /** @var bool $inscriptionReussie */ ?>
+<?php
+$erreurConnexion = $erreurConnexion ?? '';
+$messageConnexion = $messageConnexion ?? '';
+$inscriptionReussie = $inscriptionReussie ?? false;
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Connexion - LINS</title>
-    <link rel="stylesheet" href="includes/css/style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Connexion | LINS</title>
+	<link rel="stylesheet" href="includes/css/style.css">
 </head>
-<body>
-    <main class="inscription">
-        <section class="carte-inscription" aria-labelledby="titre-connexion">
-            <header class="entete-inscription">
-                <p class="sur-titre">Ravi de vous revoir</p>
-                <h1 id="titre-connexion">Connexion</h1>
-                <p>Connectez-vous à votre compte LINS.</p>
-            </header>
+<body class="page-connexion">
+	<main class="connexion">
+		<section class="connexion__panneau" aria-labelledby="titre-connexion">
+			<p class="connexion__marque">LINS</p>
+			<h1 id="titre-connexion">Connexion</h1>
+			<p class="connexion__intro">Accédez à votre espace.</p>
 
-            <?php if ($inscriptionReussie): ?>
-                <div class="message message-succes" role="status">
-                    Votre compte a été créé. Vous pouvez maintenant vous connecter.
-                </div>
-            <?php endif; ?>
+			<?php if ($inscriptionReussie): ?>
+				<p class="connexion__succes" role="status">
+					Votre compte a été créé. Vous pouvez maintenant vous connecter.
+				</p>
+			<?php endif; ?>
+			<?php if ($erreurConnexion !== ''): ?>
+				<p class="connexion__erreur" role="alert">
+					<?= htmlspecialchars($erreurConnexion, ENT_QUOTES, 'UTF-8') ?>
+				</p>
+			<?php endif; ?>
+			<?php if ($messageConnexion !== ''): ?>
+				<p class="connexion__succes" role="status">
+					<?= htmlspecialchars($messageConnexion, ENT_QUOTES, 'UTF-8') ?>
+				</p>
+			<?php endif; ?>
 
-            <form method="post" action="index.php?uc=auth&amp;action=login" class="formulaire-inscription">
-                <div class="champ">
-                    <label for="email">Adresse email</label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        maxlength="255"
-                        autocomplete="email"
-                        required
-                    >
-                </div>
+			<form action="index.php?uc=auth&amp;action=login" method="post">
+				<div class="champ">
+					<label for="email">Adresse e-mail</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						autocomplete="email"
+						required
+						autofocus
+					>
+				</div>
 
-                <div class="champ">
-                    <label for="mot_de_passe">Mot de passe</label>
-                    <input
-                        id="mot_de_passe"
-                        name="mot_de_passe"
-                        type="password"
-                        autocomplete="current-password"
-                        required
-                    >
-                </div>
+				<div class="champ">
+					<label for="mot_de_passe">Mot de passe</label>
+					<input
+						type="password"
+						id="mot_de_passe"
+						name="mot_de_passe"
+						autocomplete="current-password"
+						required
+					>
+				</div>
 
-                <div class="champ">
-                    <label for="confirmation">Confirmation du mot de passe</label>
-                    <input
-                        id="confirmation"
-                        name="confirmation"
-                        type="password"
-                        autocomplete="current-password"
-                        required
-                    >
-                </div>
+				<button type="submit">Se connecter</button>
+			</form>
 
-                <button type="submit" class="bouton-inscription">Se connecter</button>
-            </form>
-
-            <p class="lien-inscription">
-                Vous n’avez pas encore de compte ?
-                <a href="index.php?uc=auth&action=register">Créer un compte</a>
-            </p>
-        </section>
-    </main>
+			<p class="lien-inscription">
+				Vous n’avez pas encore de compte ?
+				<a href="index.php?uc=auth&amp;action=register">Créer un compte</a>
+			</p>
+		</section>
+	</main>
 </body>
 </html>
