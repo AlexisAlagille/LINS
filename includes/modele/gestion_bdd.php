@@ -58,18 +58,27 @@ function creerUtilisateur(PDO $bdd, array $donnees, string $motDePasse): void
     ]);
 }
 
-function verifierConnexion($email, $motdepasse)
+function getUserRole(PDO $bdd, string $email): ?string
 {
-	global $bdd;
+    $requete = $bdd->prepare(
+        'SELECT role.libelle
+        FROM user
+        JOIN role ON role.id = user.id_role
+        WHERE user.email = ?
+        LIMIT 1'
+    );
+    $requete->execute([$email]);
+    $role = $requete->fetchColumn();
 
-	if (!isset($bdd) || !($bdd instanceof PDO)) {
-		return false;
-	}
+    return $role === false ? null : $role;
+}
 
+function verifierConnexion(PDO $bdd, string $email, string $motdepasse): bool
+{
 	$requete = $bdd->prepare(
-		"SELECT password FROM user WHERE email = :email LIMIT 1"
+		'SELECT password FROM user WHERE email = ? LIMIT 1'
 	);
-	$requete->execute(["email" => $email]);
+	$requete->execute([$email]);
 	$utilisateur = $requete->fetch(PDO::FETCH_ASSOC);
 
 	return is_array($utilisateur)

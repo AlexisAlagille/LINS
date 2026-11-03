@@ -1,10 +1,19 @@
 :root {
     color-scheme: light;
     font-family: "Segoe UI", Arial, sans-serif;
-    color: #17231c;
-    background: #f3f6f2;
+    color: #293d31;
+    background: #eee8dc;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+    --color-forest: #293d31;
+    --color-forest-deep: #203328;
+    --color-bark: #8a653d;
+    --color-bark-dark: #5a4935;
+    --color-cream: #f7f3eb;
+    --color-background: #eee8dc;
+    --color-paper: #fffdf9;
+    --color-muted: #756d60;
+    --color-border: #d8cbb5;
 }
 
 * {
@@ -15,22 +24,24 @@ body {
     min-width: 320px;
     min-height: 100vh;
     margin: 0;
+    background: var(--color-background);
 }
 
 .inscription {
     display: grid;
-    min-height: 100vh;
+    min-height: calc(100vh - 82px);
     padding: 32px 16px;
     place-items: center;
+    background: var(--color-background);
 }
 
 .carte-inscription {
     width: min(100%, 520px);
     padding: 40px;
-    border: 1px solid #e0e8e1;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 16px 48px rgb(23 35 28 / 8%);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-paper);
+    box-shadow: 0 14px 36px rgb(48 39 27 / 8%);
 }
 
 .entete-inscription {
@@ -44,13 +55,13 @@ body {
 
 .entete-inscription p {
     margin: 0;
-    color: #59665d;
+    color: var(--color-muted);
     line-height: 1.5;
 }
 
 .entete-inscription .sur-titre {
     margin-bottom: 8px;
-    color: #276345;
+    color: var(--color-bark);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -73,6 +84,7 @@ body {
 }
 
 .champ label {
+    color: var(--color-forest);
     font-size: 0.92rem;
     font-weight: 600;
 }
@@ -81,28 +93,28 @@ body {
     width: 100%;
     min-height: 46px;
     padding: 10px 12px;
-    border: 1px solid #cbd6cd;
-    border-radius: 8px;
+    border: 1px solid #cfc4b2;
+    border-radius: 3px;
     background: #fff;
     color: inherit;
     font: inherit;
 }
 
 .champ input:focus {
-    border-color: #276345;
-    outline: 3px solid rgb(39 99 69 / 16%);
+    border-color: var(--color-bark);
+    outline: 3px solid rgb(138 101 61 / 18%);
 }
 
 .champ small {
-    color: #59665d;
+    color: var(--color-muted);
 }
 
 .bouton-inscription {
     min-height: 48px;
     margin-top: 4px;
     border: 0;
-    border-radius: 8px;
-    background: #276345;
+    border-radius: 3px;
+    background: var(--color-forest);
     color: #fff;
     cursor: pointer;
     font: inherit;
@@ -110,11 +122,11 @@ body {
 }
 
 .bouton-inscription:hover {
-    background: #1d5037;
+    background: var(--color-forest-deep);
 }
 
 .bouton-inscription:focus-visible {
-    outline: 3px solid #8dbb9c;
+    outline: 3px solid #b89a72;
     outline-offset: 3px;
 }
 
@@ -136,15 +148,32 @@ body {
 }
 
 .message-succes {
-    border: 1px solid #a9d2b5;
-    background: #edf8ef;
-    color: #205333;
+    border: 1px solid #b8c2a8;
+    background: #f0f1e8;
+    color: #354a38;
 }
 
 .message-erreur {
-    border: 1px solid #e2b3ad;
-    background: #fff2f0;
-    color: #842e24;
+    border: 1px solid #d5afa2;
+    background: #f8eeea;
+    color: #7d3e31;
+}
+
+.lien-inscription {
+    margin: 24px 0 0;
+    color: var(--color-muted);
+    text-align: center;
+}
+
+.lien-inscription a {
+    color: var(--color-forest);
+    font-weight: 600;
+    text-decoration-color: var(--color-bark);
+    text-underline-offset: 3px;
+}
+
+.lien-inscription a:hover {
+    color: var(--color-bark-dark);
 }
 
 @media (max-width: 520px) {
@@ -156,29 +185,10 @@ body {
         grid-template-columns: 1fr;
     }
 }
-:root {
-	color-scheme: light;
-	font-family: "Segoe UI", sans-serif;
-	color: #202a32;
-	background: #edf2f0;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-body {
-	margin: 0;
-	min-width: 320px;
-	min-height: 100vh;
-}
-
 .page-connexion {
-	display: grid;
-	min-height: 100vh;
-	place-items: center;
-	padding: 24px;
-	background: linear-gradient(135deg, #edf2f0 0%, #f8f8f3 55%, #e4eeeb 100%);
+	display: block;
+	padding: 0;
+	background: var(--color-background);
 }
 
 .connexion {
@@ -187,15 +197,15 @@ body {
 
 .connexion__panneau {
 	padding: 40px;
-	border: 1px solid #dce5e1;
-	border-radius: 8px;
-	background: #fff;
-	box-shadow: 0 18px 50px rgb(26 49 43 / 9%);
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	background: var(--color-paper);
+	box-shadow: 0 14px 36px rgb(48 39 27 / 8%);
 }
 
 .connexion__marque {
 	margin: 0 0 32px;
-	color: #16745f;
+	color: var(--color-bark);
 	font-size: 14px;
 	font-weight: 800;
 	letter-spacing: 0.12em;
@@ -203,13 +213,14 @@ body {
 
 .connexion h1 {
 	margin: 0;
+	color: var(--color-forest);
 	font-size: 28px;
 	line-height: 1.2;
 }
 
 .connexion__intro {
 	margin: 10px 0 28px;
-	color: #64716e;
+	color: var(--color-muted);
 	line-height: 1.5;
 }
 
@@ -228,16 +239,16 @@ body {
 	width: 100%;
 	min-height: 46px;
 	padding: 10px 12px;
-	border: 1px solid #cbd6d1;
-	border-radius: 4px;
+	border: 1px solid #cfc4b2;
+	border-radius: 3px;
 	background: #fff;
-	color: #202a32;
+	color: var(--color-forest);
 	font: inherit;
 }
 
 .champ input:focus-visible {
-	border-color: #16745f;
-	outline: 3px solid rgb(22 116 95 / 18%);
+	border-color: var(--color-bark);
+	outline: 3px solid rgb(138 101 61 / 18%);
 }
 
 .connexion button {
@@ -245,8 +256,8 @@ body {
 	min-height: 48px;
 	margin-top: 4px;
 	border: 0;
-	border-radius: 4px;
-	background: #16745f;
+	border-radius: 3px;
+	background: var(--color-forest);
 	color: #fff;
 	cursor: pointer;
 	font: inherit;
@@ -254,32 +265,216 @@ body {
 }
 
 .connexion button:hover {
-	background: #105b4a;
+	background: var(--color-forest-deep);
 }
 
 .connexion button:focus-visible {
-	outline: 3px solid #90c7b7;
+	outline: 3px solid #b89a72;
 	outline-offset: 3px;
 }
 
 .connexion__erreur {
 	margin: 0 0 20px;
 	padding: 12px;
-	border-left: 3px solid #b43e35;
-	background: #fff1ef;
-	color: #812c26;
+	border-left: 3px solid #9a5142;
+	background: #f8eeea;
+	color: #7d3e31;
 }
 
 .connexion__succes {
 	margin: 0 0 20px;
 	padding: 12px;
-	border-left: 3px solid #16745f;
-	background: #edf7f3;
-	color: #105b4a;
+	border-left: 3px solid #687c5e;
+	background: #f0f1e8;
+	color: #354a38;
 }
 
 @media (max-width: 480px) {
 	.connexion__panneau {
 		padding: 30px 24px;
+	}
+}
+
+.navigation-principale {
+	width: 100%;
+	padding: 0 clamp(20px, 5vw, 72px);
+	border-bottom: 1px solid var(--color-border);
+	background: var(--color-cream);
+	box-shadow: 0 3px 14px rgb(48 39 27 / 5%);
+}
+
+.navigation-interieur {
+	display: flex;
+	width: min(100%, 1440px);
+	min-height: 82px;
+	align-items: center;
+	justify-content: space-between;
+	gap: clamp(20px, 4vw, 56px);
+	margin: 0 auto;
+}
+
+.navigation-marque {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: 12px;
+	color: var(--color-forest);
+	text-decoration: none;
+}
+
+.navigation-logo {
+	display: block;
+	width: 68px;
+	height: 58px;
+	object-fit: contain;
+	mix-blend-mode: multiply;
+}
+
+.navigation-identite {
+	display: grid;
+	gap: 2px;
+}
+
+.navigation-identite strong {
+	font-size: 1.05rem;
+	letter-spacing: 0.13em;
+}
+
+.navigation-identite small {
+	color: var(--color-muted);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 0.78rem;
+	font-style: italic;
+}
+
+.navigation-liens {
+	display: flex;
+	height: 82px;
+	align-items: stretch;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: clamp(4px, 1.2vw, 18px);
+}
+
+.navigation-liens a {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px 0;
+	color: #45483c;
+	font-size: 0.94rem;
+	font-weight: 500;
+	text-decoration: none;
+	transition: color 160ms ease;
+}
+
+.navigation-liens a::after {
+	position: absolute;
+	right: 10px;
+	bottom: 17px;
+	left: 10px;
+	height: 2px;
+	background: var(--color-bark);
+	content: "";
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 160ms ease;
+}
+
+.navigation-liens a:hover,
+.navigation-liens a:focus-visible,
+.navigation-liens a[aria-current="page"] {
+	color: var(--color-forest);
+}
+
+.navigation-liens a:hover::after,
+.navigation-liens a:focus-visible::after,
+.navigation-liens a[aria-current="page"]::after {
+	transform: scaleX(1);
+}
+
+.navigation-liens a:focus-visible,
+.navigation-marque:focus-visible {
+	outline: 2px solid var(--color-bark);
+	outline-offset: 4px;
+}
+
+.formulaire-deconnexion {
+	flex: 0 0 auto;
+	margin: 0;
+}
+
+.formulaire-deconnexion button {
+	min-height: 40px;
+	padding: 8px 15px;
+	border: 1px solid #cbb99d;
+	border-radius: 3px;
+	background: transparent;
+	color: var(--color-bark-dark);
+	cursor: pointer;
+	font: inherit;
+	font-size: 0.9rem;
+	transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.formulaire-deconnexion button:hover {
+	border-color: #9a7445;
+	background: #eee5d7;
+}
+
+.formulaire-deconnexion button:focus-visible {
+	outline: 2px solid #8a653d;
+	outline-offset: 3px;
+}
+
+.page-connexion {
+	display: block;
+	padding: 0;
+}
+
+.page-connexion .connexion {
+	margin: clamp(40px, 8vh, 80px) auto;
+}
+
+@media (max-width: 760px) {
+	.navigation-interieur {
+		min-height: 74px;
+		flex-wrap: wrap;
+		gap: 0 16px;
+		padding: 14px 0;
+	}
+
+	.navigation-liens {
+		order: 3;
+		width: 100%;
+		height: auto;
+		justify-content: flex-start;
+		gap: 0 12px;
+	}
+
+	.navigation-liens a {
+		min-height: 44px;
+		padding: 0 5px;
+	}
+
+	.navigation-liens a::after {
+		right: 5px;
+		bottom: 3px;
+		left: 5px;
+	}
+
+	.formulaire-deconnexion {
+		margin-left: auto;
+	}
+}
+
+@media (max-width: 420px) {
+	.navigation-identite small {
+		font-size: 0.72rem;
+	}
+
+	.formulaire-deconnexion button {
+		padding: 7px 10px;
+		font-size: 0.82rem;
 	}
 }

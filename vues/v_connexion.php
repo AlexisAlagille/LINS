@@ -12,6 +12,7 @@ $inscriptionReussie = $inscriptionReussie ?? false;
 	<link rel="stylesheet" href="includes/css/style.css">
 </head>
 <body class="page-connexion">
+	<?php require __DIR__ . '/v_header.php'; ?>
 	<main class="connexion">
 		<section class="connexion__panneau" aria-labelledby="titre-connexion">
 			<p class="connexion__marque">LINS</p>

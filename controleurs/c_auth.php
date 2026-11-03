@@ -9,6 +9,38 @@ if ($inscriptionReussie) {
 }
 
 switch ($action) {
+    case 'logout':
+        $jetonCsrf = isset($_POST['jeton_csrf']) && is_string($_POST['jeton_csrf'])
+            ? $_POST['jeton_csrf']
+            : '';
+
+        if (
+            $_SERVER['REQUEST_METHOD'] !== 'POST'
+            || !isset($_SESSION['jeton_csrf_deconnexion'])
+            || !is_string($_SESSION['jeton_csrf_deconnexion'])
+            || !hash_equals($_SESSION['jeton_csrf_deconnexion'], $jetonCsrf)
+        ) {
+            http_response_code(400);
+            exit('Requête de déconnexion invalide.');
+        }
+
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $parametresCookie = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $parametresCookie['path'],
+                $parametresCookie['domain'],
+                $parametresCookie['secure'],
+                $parametresCookie['httponly']
+            );
+        }
+        session_destroy();
+        header('Location: index.php?uc=auth&action=login');
+        exit;
+
     case 'register':
         $erreurs = [];
         $donnees = [
@@ -100,10 +132,18 @@ switch ($action) {
             if (
                 filter_var($email, FILTER_VALIDATE_EMAIL) !== false
                 && $motDePasse !== ''
-                && verifierConnexion($email, $motDePasse)
+                && verifierConnexion($bdd, $email, $motDePasse)
             ) {
-                $_SESSION['email'] = $email;
-                $messageConnexion = 'Connexion réussie.';
+                $role = getUserRole($bdd, $email);
+                if ($role === null) {
+                    error_log('Connexion refusée : aucun rôle trouvé pour un compte authentifié.');
+                    $erreurConnexion = 'Impossible de charger votre compte. Veuillez réessayer.';
+                } else {
+                    session_regenerate_id(true);
+                    $_SESSION['email'] = $email;
+                    $_SESSION['role'] = $role;
+                    $messageConnexion = 'Connexion réussie.';
+                }
             } else {
                 $erreurConnexion = 'Adresse e-mail ou mot de passe incorrect.';
             }
