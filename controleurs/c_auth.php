@@ -142,7 +142,8 @@ switch ($action) {
                     session_regenerate_id(true);
                     $_SESSION['email'] = $email;
                     $_SESSION['role'] = $role;
-                    $messageConnexion = 'Connexion réussie.';
+                    header('Location: index.php?uc=accueil');
+                    exit;
                 }
             } else {
                 $erreurConnexion = 'Adresse e-mail ou mot de passe incorrect.';
