@@ -84,3 +84,15 @@ function verifierConnexion(PDO $bdd, string $email, string $motdepasse): bool
 	return is_array($utilisateur)
 		&& password_verify($motdepasse, $utilisateur["password"]);
 }
+
+function getTousLesProduits(PDO $bdd): array
+{
+    $requete = $bdd->query(
+        'SELECT produit.libelle, produit.prix, produit.description, type_bois.libelle AS type_bois
+         FROM produit
+         LEFT JOIN type_bois ON type_bois.id = produit.id_type_bois
+         ORDER BY type_bois.libelle, produit.libelle'
+    );
+
+    return $requete->fetchAll(PDO::FETCH_ASSOC);
+}

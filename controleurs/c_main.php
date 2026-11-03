@@ -9,8 +9,8 @@ else {
 switch ($uc)
 {
     case 'auth' : {  include "c_auth.php" ; break ;} 
+    case 'produits' : { include "c_produits.php" ; break ;}
 }
 
 ?>
-
 
