@@ -176,6 +176,212 @@ body {
     color: var(--color-bark-dark);
 }
 
+.catalogue {
+    width: min(100% - 40px, 1200px);
+    min-height: calc(100vh - 82px);
+    margin: 0 auto;
+    padding: clamp(40px, 7vw, 80px) 0;
+}
+
+.catalogue-entete {
+    max-width: 680px;
+    margin-bottom: 36px;
+    animation: apparition-douce 650ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.catalogue-sur-titre {
+    margin: 0 0 10px;
+    color: var(--color-bark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.catalogue-entete h1 {
+    margin: 0 0 10px;
+    color: var(--color-forest);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 500;
+}
+
+.catalogue-entete > p:last-child {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.6;
+}
+
+.catalogue-compte {
+    margin: 0 0 16px;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+
+.grille-produits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr));
+    gap: 22px;
+}
+
+.carte-produit {
+    display: flex;
+    min-width: 0;
+    min-height: 360px;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    background: var(--color-paper);
+    box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
+    animation: apparition-carte 700ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
+    transition:
+        translate 260ms cubic-bezier(0.2, 0.7, 0.25, 1),
+        border-color 260ms ease,
+        box-shadow 260ms ease;
+}
+
+.carte-produit:nth-child(2) {
+    animation-delay: 70ms;
+}
+
+.carte-produit:nth-child(3) {
+    animation-delay: 140ms;
+}
+
+.carte-produit:nth-child(4) {
+    animation-delay: 210ms;
+}
+
+.carte-produit:nth-child(5) {
+    animation-delay: 280ms;
+}
+
+.carte-produit:nth-child(6) {
+    animation-delay: 350ms;
+}
+
+.carte-produit:hover {
+    translate: 0 -7px;
+    border-color: #b89a72;
+    box-shadow: 0 18px 34px rgb(48 39 27 / 13%);
+}
+
+.produit-image {
+    display: block;
+    width: 100%;
+    height: 190px;
+    padding: 12px;
+    border-bottom: 1px solid var(--color-border);
+    background: #fff;
+    object-fit: contain;
+    transition:
+        transform 500ms cubic-bezier(0.2, 0.7, 0.25, 1),
+        filter 300ms ease;
+}
+
+.carte-produit:hover .produit-image {
+    transform: scale(1.055);
+    filter: saturate(1.08);
+}
+
+.carte-produit > :not(.produit-image) {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.produit-categorie {
+    align-self: flex-start;
+    margin-top: 18px;
+    margin-bottom: 12px;
+    padding: 5px 9px;
+    background: #eee5d7;
+    color: var(--color-bark-dark);
+    font-size: 0.78rem;
+    text-transform: capitalize;
+}
+
+.carte-produit h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--color-forest);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.produit-description {
+    margin-top: 0;
+    margin-bottom: 22px;
+    color: var(--color-muted);
+    font-size: 0.93rem;
+    line-height: 1.55;
+}
+
+.produit-prix {
+    margin-top: auto;
+    margin-bottom: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e8dfd1;
+    color: var(--color-forest);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.catalogue-vide {
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    background: var(--color-paper);
+    color: var(--color-muted);
+}
+
+@keyframes apparition-douce {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes apparition-carte {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .carte-produit,
+    .carte-produit:hover {
+        translate: none;
+    }
+
+    .carte-produit:hover,
+    .carte-produit:hover .produit-image {
+        transform: none;
+    }
+}
+
 @media (max-width: 520px) {
     .carte-inscription {
         padding: 28px 22px;
@@ -183,6 +389,10 @@ body {
 
     .grille-champs {
         grid-template-columns: 1fr;
+    }
+
+    .catalogue {
+        width: min(100% - 32px, 1200px);
     }
 }
 .page-connexion {
