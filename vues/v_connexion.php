@@ -2,6 +2,9 @@
 $erreurConnexion = $erreurConnexion ?? '';
 $messageConnexion = $messageConnexion ?? '';
 $inscriptionReussie = $inscriptionReussie ?? false;
+$echapper = static function (string $valeur): string {
+	return htmlspecialchars($valeur, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+};
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,30 +14,32 @@ $inscriptionReussie = $inscriptionReussie ?? false;
 	<title>Connexion | LINS</title>
 	<link rel="stylesheet" href="includes/css/style.css">
 </head>
-<body class="page-connexion">
-	<main class="connexion">
-		<section class="connexion__panneau" aria-labelledby="titre-connexion">
-			<p class="connexion__marque">LINS</p>
-			<h1 id="titre-connexion">Connexion</h1>
-			<p class="connexion__intro">Accédez à votre espace.</p>
+<body>
+	<main class="inscription">
+		<section class="carte-inscription" aria-labelledby="titre-connexion">
+			<header class="entete-inscription">
+				<p class="sur-titre">Ravi de vous revoir</p>
+				<h1 id="titre-connexion">Connexion</h1>
+				<p>Connectez-vous à votre compte LINS.</p>
+			</header>
 
 			<?php if ($inscriptionReussie): ?>
-				<p class="connexion__succes" role="status">
+				<div class="message message-succes" role="status">
 					Votre compte a été créé. Vous pouvez maintenant vous connecter.
-				</p>
+				</div>
 			<?php endif; ?>
 			<?php if ($erreurConnexion !== ''): ?>
-				<p class="connexion__erreur" role="alert">
-					<?= htmlspecialchars($erreurConnexion, ENT_QUOTES, 'UTF-8') ?>
-				</p>
+				<div class="message message-erreur" role="alert">
+					<?= $echapper($erreurConnexion) ?>
+				</div>
 			<?php endif; ?>
 			<?php if ($messageConnexion !== ''): ?>
-				<p class="connexion__succes" role="status">
-					<?= htmlspecialchars($messageConnexion, ENT_QUOTES, 'UTF-8') ?>
-				</p>
+				<div class="message message-succes" role="status">
+					<?= $echapper($messageConnexion) ?>
+				</div>
 			<?php endif; ?>
 
-			<form action="index.php?uc=auth&amp;action=login" method="post">
+			<form action="index.php?uc=auth&amp;action=login" method="post" class="formulaire-inscription">
 				<div class="champ">
 					<label for="email">Adresse e-mail</label>
 					<input
@@ -58,7 +63,7 @@ $inscriptionReussie = $inscriptionReussie ?? false;
 					>
 				</div>
 
-				<button type="submit">Se connecter</button>
+				<button type="submit" class="bouton-inscription">Se connecter</button>
 			</form>
 
 			<p class="lien-inscription">

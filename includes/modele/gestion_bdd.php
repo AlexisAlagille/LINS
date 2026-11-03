@@ -75,3 +75,15 @@ function verifierConnexion($email, $motdepasse)
 	return is_array($utilisateur)
 		&& password_verify($motdepasse, $utilisateur["password"]);
 }
+
+function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
+{
+    $limite = max(1, min($limite, 12));
+    $requete = $bdd->prepare(
+        'SELECT id, libelle, prix, description FROM produit ORDER BY id DESC LIMIT :limite'
+    );
+    $requete->bindValue(':limite', $limite, PDO::PARAM_INT);
+    $requete->execute();
+
+    return $requete->fetchAll();
+}
