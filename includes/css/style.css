@@ -1,0 +1,158 @@
+:root {
+    color-scheme: light;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #17231c;
+    background: #f3f6f2;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.inscription {
+    display: grid;
+    min-height: 100vh;
+    padding: 32px 16px;
+    place-items: center;
+}
+
+.carte-inscription {
+    width: min(100%, 520px);
+    padding: 40px;
+    border: 1px solid #e0e8e1;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 16px 48px rgb(23 35 28 / 8%);
+}
+
+.entete-inscription {
+    margin-bottom: 28px;
+}
+
+.entete-inscription h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.7rem, 5vw, 2.1rem);
+}
+
+.entete-inscription p {
+    margin: 0;
+    color: #59665d;
+    line-height: 1.5;
+}
+
+.entete-inscription .sur-titre {
+    margin-bottom: 8px;
+    color: #276345;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.formulaire-inscription,
+.grille-champs {
+    display: grid;
+    gap: 18px;
+}
+
+.grille-champs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.champ {
+    display: grid;
+    gap: 7px;
+}
+
+.champ label {
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.champ input {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid #cbd6cd;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+}
+
+.champ input:focus {
+    border-color: #276345;
+    outline: 3px solid rgb(39 99 69 / 16%);
+}
+
+.champ small {
+    color: #59665d;
+}
+
+.bouton-inscription {
+    min-height: 48px;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 8px;
+    background: #276345;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.bouton-inscription:hover {
+    background: #1d5037;
+}
+
+.bouton-inscription:focus-visible {
+    outline: 3px solid #8dbb9c;
+    outline-offset: 3px;
+}
+
+.message {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.message p {
+    margin: 0 0 6px;
+    font-weight: 700;
+}
+
+.message ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.message-succes {
+    border: 1px solid #a9d2b5;
+    background: #edf8ef;
+    color: #205333;
+}
+
+.message-erreur {
+    border: 1px solid #e2b3ad;
+    background: #fff2f0;
+    color: #842e24;
+}
+
+@media (max-width: 520px) {
+    .carte-inscription {
+        padding: 28px 22px;
+    }
+
+    .grille-champs {
+        grid-template-columns: 1fr;
+    }
+}
