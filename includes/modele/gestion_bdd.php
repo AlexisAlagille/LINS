@@ -96,3 +96,36 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
 
     return $requete->fetchAll();
 }
+
+function obtenirInformationsUtilisateur(PDO $bdd, string $email): ?array
+{
+    $requete = $bdd->prepare(
+        'SELECT identifiant, nom, prenom, email FROM user WHERE email = ? LIMIT 1'
+    );
+    $requete->execute([$email]);
+    $utilisateur = $requete->fetch();
+
+    return is_array($utilisateur) ? $utilisateur : null;
+}
+
+function modifierInformationsUtilisateur(PDO $bdd, string $emailActuel, array $donnees): void
+{
+    $rechercheEmail = $bdd->prepare(
+        'SELECT id FROM user WHERE email = ? AND email <> ? LIMIT 1'
+    );
+    $rechercheEmail->execute([$donnees['email'], $emailActuel]);
+
+    if ($rechercheEmail->fetchColumn() !== false) {
+        throw new InvalidArgumentException('Cette adresse email est déjà utilisée.');
+    }
+
+    $miseAJour = $bdd->prepare(
+        'UPDATE user SET nom = ?, prenom = ?, email = ? WHERE email = ?'
+    );
+    $miseAJour->execute([
+        $donnees['nom'],
+        $donnees['prenom'],
+        $donnees['email'],
+        $emailActuel,
+    ]);
+}

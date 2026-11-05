@@ -4,6 +4,7 @@ $menusParRole = [
         ['Accueil', 'index.php?uc=accueil'],
         ['Nos produits', 'index.php?uc=produits'],
         ['Mes commandes', 'index.php?uc=commandes'],
+        ['Mon compte', 'index.php?uc=monCompte'],
     ],
     'admin' => [
         ['Tableau de bord', 'index.php?uc=accueil'],
