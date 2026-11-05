@@ -5,6 +5,14 @@ if (($_SESSION['role'] ?? '') !== 'gestionnaire') {
 }
 
 $_SESSION['jeton_csrf_gestion_produits'] ??= bin2hex(random_bytes(32));
+$repondreEnJson = static function (int $code, array $donnees): void {
+    http_response_code($code);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($donnees, JSON_THROW_ON_ERROR);
+    exit;
+};
+$requeteAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+    && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 $erreurGestionProduit = '';
 $messageGestionProduit = isset($_SESSION['message_gestion_produit'])
@@ -67,6 +75,12 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $jetonRecu = $_POST['jeton_csrf'] ?? '';
         if (!is_string($jetonRecu) || !hash_equals($_SESSION['jeton_csrf_gestion_produits'], $jetonRecu)) {
+            if ($requeteAjax) {
+                $repondreEnJson(400, [
+                    'succes' => false,
+                    'message' => 'Le formulaire a expiré. Actualise la page et réessaie.',
+                ]);
+            }
             http_response_code(400);
             $erreurGestionProduit = 'Le formulaire a expiré. Veuillez réessayer.';
         } elseif (($_POST['action'] ?? '') === 'supprimer') {
@@ -79,6 +93,41 @@ try {
                 header('Location: index.php?uc=gestion_produits');
                 exit;
             } else {
+                $erreurGestionProduit = 'Ce produit n’existe plus.';
+            }
+        } elseif (
+            ($_POST['action'] ?? '') === 'mettre_en_avant'
+            || ($_POST['action'] ?? '') === 'retirer_mise_en_avant'
+        ) {
+            $idProduit = filter_var($_POST['id_produit'] ?? null, FILTER_VALIDATE_INT);
+            if ($idProduit === false || $idProduit < 1) {
+                if ($requeteAjax) {
+                    $repondreEnJson(400, ['succes' => false, 'message' => 'Ce produit est invalide.']);
+                }
+                http_response_code(400);
+                $erreurGestionProduit = 'Ce produit est invalide.';
+            } else {
+                $misEnAvant = $_POST['action'] === 'mettre_en_avant';
+                if (definirProduitMisEnAvant($bdd, $idProduit, $misEnAvant)) {
+                    $message = $misEnAvant
+                        ? 'Le produit apparaît maintenant sur la page d’accueil.'
+                        : 'Le produit ne sera plus affiché sur la page d’accueil.';
+                    if ($requeteAjax) {
+                        $repondreEnJson(200, [
+                            'succes' => true,
+                            'mis_en_avant' => $misEnAvant,
+                            'message' => $message,
+                        ]);
+                    }
+
+                    $_SESSION['message_gestion_produit'] = $message;
+                    header('Location: index.php?uc=gestion_produits');
+                    exit;
+                }
+
+                if ($requeteAjax) {
+                    $repondreEnJson(404, ['succes' => false, 'message' => 'Ce produit n’existe plus.']);
+                }
                 $erreurGestionProduit = 'Ce produit n’existe plus.';
             }
         } else {
@@ -227,13 +276,28 @@ try {
         }
     }
 } catch (InvalidArgumentException $e) {
+    if ($requeteAjax) {
+        $repondreEnJson(400, ['succes' => false, 'message' => $e->getMessage()]);
+    }
     $erreurGestionProduit = $e->getMessage();
 } catch (PDOException $e) {
     error_log('Impossible d’enregistrer le produit : ' . $e->getMessage());
+    if ($requeteAjax) {
+        $repondreEnJson(500, [
+            'succes' => false,
+            'message' => 'La mise à jour est momentanément indisponible. Réessaie plus tard.',
+        ]);
+    }
     http_response_code(500);
     $erreurGestionProduit = 'Le produit n’a pas pu être enregistré. Vérifiez les informations et réessayez.';
 } catch (RuntimeException $e) {
     error_log('Erreur lors de la gestion d’un produit : ' . $e->getMessage());
+    if ($requeteAjax) {
+        $repondreEnJson(500, [
+            'succes' => false,
+            'message' => 'La mise à jour est momentanément indisponible. Réessaie plus tard.',
+        ]);
+    }
     http_response_code(500);
     $erreurGestionProduit = 'Le produit n’a pas pu être enregistré. Veuillez réessayer plus tard.';
 }

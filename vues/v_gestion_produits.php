@@ -171,7 +171,27 @@ $echapper = static function (?string $valeur): string {
                                     <?= $echapper($produit['type_bois']) ?>
                                     · <?= number_format((float) $produit['prix'], 2, ',', ' ') ?>&nbsp;€
                                 </p>
+                                <p class="statut-mise-en-avant">
+                                    <?= (int) $produit['mis_en_avant'] === 1 ? 'Mis en avant sur l’accueil' : 'Non mis en avant' ?>
+                                </p>
                             </div>
+                            <form method="post" action="index.php?uc=gestion_produits" class="form-mise-en-avant">
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="<?= (int) $produit['mis_en_avant'] === 1 ? 'retirer_mise_en_avant' : 'mettre_en_avant' ?>"
+                                >
+                                <input type="hidden" name="id_produit" value="<?= (int) $produit['id'] ?>">
+                                <input
+                                    type="hidden"
+                                    name="jeton_csrf"
+                                    value="<?= $echapper($_SESSION['jeton_csrf_gestion_produits']) ?>"
+                                >
+                                <button type="submit" class="bouton-mise-en-avant">
+                                    <?= (int) $produit['mis_en_avant'] === 1 ? 'Retirer de l’accueil' : 'Mettre en avant' ?>
+                                </button>
+                                <span class="retour-mise-en-avant" role="status" aria-live="polite"></span>
+                            </form>
                             <a
                                 class="bouton-modifier-produit"
                                 href="index.php?uc=gestion_produits&amp;id=<?= (int) $produit['id'] ?>"
@@ -181,6 +201,7 @@ $echapper = static function (?string $valeur): string {
                             <form
                                 method="post"
                                 action="index.php?uc=gestion_produits"
+                                class="form-suppression-produit"
                                 onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');"
                             >
                                 <input type="hidden" name="action" value="supprimer">
@@ -199,6 +220,60 @@ $echapper = static function (?string $valeur): string {
         </section>
     </main>
     <script>
+        const listeProduitsGestion = document.querySelector('.table-produits-gestion');
+
+        if (listeProduitsGestion) {
+            listeProduitsGestion.addEventListener('submit', async (evenement) => {
+                const formulaire = evenement.target.closest('.form-mise-en-avant');
+                if (!formulaire) {
+                    return;
+                }
+
+                evenement.preventDefault();
+                const bouton = formulaire.querySelector('button');
+                const retour = formulaire.querySelector('.retour-mise-en-avant');
+                bouton.disabled = true;
+                retour.textContent = 'Mise à jour…';
+
+                try {
+                    const urlFormulaire = new URL(formulaire.getAttribute('action'), window.location.href);
+                    const reponse = await fetch(urlFormulaire, {
+                        method: 'POST',
+                        body: new FormData(formulaire),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    let resultat;
+                    try {
+                        resultat = await reponse.json();
+                    } catch {
+                        throw new Error('La réponse du serveur est invalide. Réessaie.');
+                    }
+
+                    if (!reponse.ok || !resultat.succes) {
+                        throw new Error(resultat.message || 'La mise à jour a échoué.');
+                    }
+
+                    const misEnAvant = resultat.mis_en_avant;
+                    formulaire.querySelector('[name="action"]').value = misEnAvant
+                        ? 'retirer_mise_en_avant'
+                        : 'mettre_en_avant';
+                    bouton.textContent = misEnAvant ? 'Retirer de l’accueil' : 'Mettre en avant';
+                    formulaire.closest('.ligne-produit-gestion')
+                        .querySelector('.statut-mise-en-avant').textContent = misEnAvant
+                            ? 'Mis en avant sur l’accueil'
+                            : 'Non mis en avant';
+                    retour.textContent = '';
+                } catch (erreur) {
+                    retour.textContent = erreur.message || 'La mise à jour a échoué. Réessaie.';
+                } finally {
+                    bouton.disabled = false;
+                }
+            });
+        }
+
         const choixImageExistante = document.querySelector('[name="image_existante"]');
         const choixNouvelleImage = document.querySelector('[name="nouvelle_image"]');
         const apercuImage = document.querySelector('#apercu-image');

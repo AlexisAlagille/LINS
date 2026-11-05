@@ -89,7 +89,11 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
 {
     $limite = max(1, min($limite, 12));
     $requete = $bdd->prepare(
-        'SELECT id, libelle, prix, description FROM produit ORDER BY id DESC LIMIT ?'
+        'SELECT id, libelle, prix, description, image
+         FROM produit
+         WHERE mis_en_avant = 1
+         ORDER BY id DESC
+         LIMIT ?'
     );
     $requete->execute([$limite]);
 
@@ -232,13 +236,23 @@ function getProduitsGestion(PDO $bdd): array
 {
     $requete = $bdd->query(
         'SELECT produit.id, produit.libelle, produit.prix, produit.image,
-                type_bois.libelle AS type_bois
+                produit.mis_en_avant, type_bois.libelle AS type_bois
          FROM produit
          JOIN type_bois ON type_bois.id = produit.id_type_bois
          ORDER BY produit.libelle'
     );
 
     return $requete->fetchAll();
+}
+
+function definirProduitMisEnAvant(PDO $bdd, int $idProduit, bool $misEnAvant): bool
+{
+    $requete = $bdd->prepare(
+        'UPDATE produit SET mis_en_avant = ? WHERE id = ?'
+    );
+    $requete->execute([$misEnAvant ? 1 : 0, $idProduit]);
+
+    return $requete->rowCount() > 0 || getProduitGestion($bdd, $idProduit) !== null;
 }
 
 function modifierProduit(

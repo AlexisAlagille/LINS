@@ -35,3 +35,6 @@ La suppression d’un produit demande confirmation et est refusée si le produit
 dans une commande, afin de préserver l’historique.
 Il peut aussi ajouter, modifier ou supprimer les catégories depuis « Gestion catégories ».
 La suppression d’une catégorie est refusée tant qu’un produit l’utilise.
+Pour choisir les produits affichés dans la section d’accueil, appliquer
+`database/migrations/20261105_produits_mis_en_avant.sql`, puis utiliser les boutons
+« Mettre en avant » de la gestion du catalogue. Jusqu’à six produits sélectionnés sont affichés.
