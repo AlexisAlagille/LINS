@@ -22,10 +22,32 @@ $donneesProduit = [
 ];
 $typesBois = [];
 $imagesExistantes = [];
+$produitsGestion = [];
+$produitEnCours = null;
+$modeModification = false;
 $dossierImages = __DIR__ . '/../includes/images/produits';
 
 try {
     $typesBois = getTypesBois($bdd);
+    $produitsGestion = getProduitsGestion($bdd);
+
+    $idProduitDemande = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+    if ($idProduitDemande !== false && $idProduitDemande !== null && $idProduitDemande > 0) {
+        $produitEnCours = getProduitGestion($bdd, $idProduitDemande);
+        if ($produitEnCours === null) {
+            http_response_code(404);
+            $erreurGestionProduit = 'Ce produit n’existe plus.';
+        } else {
+            $modeModification = true;
+            $donneesProduit = [
+                'libelle' => $produitEnCours['libelle'],
+                'prix' => (string) $produitEnCours['prix'],
+                'description' => $produitEnCours['description'] ?? '',
+                'id_type_bois' => (string) $produitEnCours['id_type_bois'],
+                'image_existante' => $produitEnCours['image'],
+            ];
+        }
+    }
 
     $fichiersDuDossier = scandir($dossierImages);
     if ($fichiersDuDossier === false) {
@@ -47,6 +69,18 @@ try {
         if (!is_string($jetonRecu) || !hash_equals($_SESSION['jeton_csrf_gestion_produits'], $jetonRecu)) {
             http_response_code(400);
             $erreurGestionProduit = 'Le formulaire a expiré. Veuillez réessayer.';
+        } elseif (($_POST['action'] ?? '') === 'supprimer') {
+            $idProduit = filter_var($_POST['id_produit'] ?? null, FILTER_VALIDATE_INT);
+            if ($idProduit === false || $idProduit < 1) {
+                http_response_code(400);
+                $erreurGestionProduit = 'Ce produit est invalide.';
+            } elseif (supprimerProduit($bdd, $idProduit)) {
+                $_SESSION['message_gestion_produit'] = 'Le produit a été supprimé du catalogue.';
+                header('Location: index.php?uc=gestion_produits');
+                exit;
+            } else {
+                $erreurGestionProduit = 'Ce produit n’existe plus.';
+            }
         } else {
             foreach ($donneesProduit as $champ => $valeur) {
                 if (isset($_POST[$champ]) && is_string($_POST[$champ])) {
@@ -54,20 +88,37 @@ try {
                 }
             }
 
+            $actionProduit = $_POST['action'] ?? '';
+            $idProduit = filter_var($_POST['id_produit'] ?? null, FILTER_VALIDATE_INT);
+            if ($actionProduit === 'modifier' && ($idProduit === false || $idProduit < 1)) {
+                $erreurGestionProduit = 'Ce produit est invalide.';
+            }
+
             $prix = filter_var($donneesProduit['prix'], FILTER_VALIDATE_FLOAT);
             $idTypeBois = filter_var($donneesProduit['id_type_bois'], FILTER_VALIDATE_INT);
 
             if (
-                $donneesProduit['libelle'] === ''
-                || !mb_check_encoding($donneesProduit['libelle'], 'UTF-8')
-                || mb_strlen($donneesProduit['libelle'], 'UTF-8') > 150
+                $erreurGestionProduit === ''
+                && $actionProduit !== 'ajouter'
+                && $actionProduit !== 'modifier'
+            ) {
+                $erreurGestionProduit = 'Cette action est invalide.';
+            } elseif (
+                $erreurGestionProduit === ''
+                && (
+                    $donneesProduit['libelle'] === ''
+                    || !mb_check_encoding($donneesProduit['libelle'], 'UTF-8')
+                    || mb_strlen($donneesProduit['libelle'], 'UTF-8') > 150
+                )
             ) {
                 $erreurGestionProduit = 'Le nom du produit est obligatoire et ne doit pas dépasser 150 caractères.';
-            } elseif ($prix === false || $prix < 0 || $prix > 99999999.99) {
+            } elseif ($erreurGestionProduit === '' && ($prix === false || $prix < 0 || $prix > 99999999.99)) {
                 $erreurGestionProduit = 'Saisissez un prix valide et positif.';
-            } elseif ($idTypeBois === false || $idTypeBois < 1) {
+            } elseif ($erreurGestionProduit === '' && ($idTypeBois === false || $idTypeBois < 1)) {
                 $erreurGestionProduit = 'Choisissez un type de bois.';
-            } else {
+            }
+
+            if ($erreurGestionProduit === '') {
                 $image = '';
                 $fichierTemporaire = null;
                 $fichierImage = $_FILES['nouvelle_image'] ?? null;
@@ -118,6 +169,12 @@ try {
                             }
                         }
                     }
+                } elseif (
+                    $actionProduit === 'modifier'
+                    && $donneesProduit['image_existante'] === ''
+                    && $produitEnCours !== null
+                ) {
+                    $image = $produitEnCours['image'];
                 } elseif (in_array($donneesProduit['image_existante'], $imagesExistantes, true)) {
                     $image = $donneesProduit['image_existante'];
                 } else {
@@ -126,17 +183,39 @@ try {
 
                 if ($erreurGestionProduit === '') {
                     try {
-                        ajouterProduit(
-                            $bdd,
-                            $donneesProduit['libelle'],
-                            (float) $prix,
-                            $donneesProduit['description'],
-                            $image,
-                            (int) $idTypeBois
-                        );
-                        $_SESSION['message_gestion_produit'] = 'Le produit a été ajouté au catalogue.';
-                        header('Location: index.php?uc=gestion_produits');
-                        exit;
+                        if ($actionProduit === 'modifier') {
+                            if (!modifierProduit(
+                                $bdd,
+                                (int) $idProduit,
+                                $donneesProduit['libelle'],
+                                (float) $prix,
+                                $donneesProduit['description'],
+                                $image,
+                                (int) $idTypeBois
+                            )) {
+                                $erreurGestionProduit = 'Ce produit n’existe plus.';
+                            } else {
+                                $_SESSION['message_gestion_produit'] = 'Le produit a été modifié.';
+                            }
+                        } else {
+                            ajouterProduit(
+                                $bdd,
+                                $donneesProduit['libelle'],
+                                (float) $prix,
+                                $donneesProduit['description'],
+                                $image,
+                                (int) $idTypeBois
+                            );
+                            $_SESSION['message_gestion_produit'] = 'Le produit a été ajouté au catalogue.';
+                        }
+
+                        if ($erreurGestionProduit === '') {
+                            header('Location: index.php?uc=gestion_produits');
+                            exit;
+                        }
+                        if ($fichierTemporaire !== null && is_file($fichierTemporaire)) {
+                            unlink($fichierTemporaire);
+                        }
                     } catch (Throwable $e) {
                         if ($fichierTemporaire !== null && is_file($fichierTemporaire)) {
                             unlink($fichierTemporaire);
@@ -150,13 +229,13 @@ try {
 } catch (InvalidArgumentException $e) {
     $erreurGestionProduit = $e->getMessage();
 } catch (PDOException $e) {
-    error_log('Impossible d’ajouter le produit : ' . $e->getMessage());
+    error_log('Impossible d’enregistrer le produit : ' . $e->getMessage());
     http_response_code(500);
-    $erreurGestionProduit = 'Le produit n’a pas pu être ajouté. Vérifiez les informations et réessayez.';
+    $erreurGestionProduit = 'Le produit n’a pas pu être enregistré. Vérifiez les informations et réessayez.';
 } catch (RuntimeException $e) {
-    error_log('Erreur lors de l’ajout d’un produit : ' . $e->getMessage());
+    error_log('Erreur lors de la gestion d’un produit : ' . $e->getMessage());
     http_response_code(500);
-    $erreurGestionProduit = 'Le produit n’a pas pu être ajouté. Veuillez réessayer plus tard.';
+    $erreurGestionProduit = 'Le produit n’a pas pu être enregistré. Veuillez réessayer plus tard.';
 }
 
 require __DIR__ . '/../vues/v_gestion_produits.php';

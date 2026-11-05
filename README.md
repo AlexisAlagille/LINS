@@ -29,5 +29,7 @@ plus possible une fois la commande expédiée. Le paiement et la livraison ne so
 ## Gestion du catalogue
 
 Un compte ayant le rôle `gestionnaire` peut ouvrir « Gestion catalogue » depuis la navigation
-pour ajouter un produit. Il peut sélectionner une image JPEG, PNG ou WebP déjà présente
-dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
+pour ajouter ou modifier un produit. Il peut sélectionner une image JPEG, PNG ou WebP déjà
+présente dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
+La suppression d’un produit demande confirmation et est refusée si le produit figure déjà
+dans une commande, afin de préserver l’historique.

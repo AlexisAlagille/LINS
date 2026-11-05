@@ -16,8 +16,12 @@ $echapper = static function (?string $valeur): string {
     <main class="page-gestion">
         <header class="catalogue-entete">
             <p class="catalogue-sur-titre">Espace gestionnaire</p>
-            <h1>Ajouter un produit</h1>
-            <p>Complétez les informations du produit et choisissez son image.</p>
+            <h1><?= $modeModification ? 'Modifier un produit' : 'Gestion du catalogue' ?></h1>
+            <p>
+                <?= $modeModification
+                    ? 'Modifiez les informations du produit sélectionné.'
+                    : 'Ajoutez, modifiez ou supprimez les produits du catalogue.' ?>
+            </p>
         </header>
 
         <?php if ($messageGestionProduit !== ''): ?>
@@ -30,11 +34,15 @@ $echapper = static function (?string $valeur): string {
 
         <form
             method="post"
-            action="index.php?uc=gestion_produits"
+            action="index.php?uc=gestion_produits<?= $modeModification ? '&amp;id=' . (int) $produitEnCours['id'] : '' ?>"
             class="formulaire-gestion"
             enctype="multipart/form-data"
         >
             <input type="hidden" name="MAX_FILE_SIZE" value="2097152">
+            <input type="hidden" name="action" value="<?= $modeModification ? 'modifier' : 'ajouter' ?>">
+            <?php if ($modeModification): ?>
+                <input type="hidden" name="id_produit" value="<?= (int) $produitEnCours['id'] ?>">
+            <?php endif; ?>
             <input
                 type="hidden"
                 name="jeton_csrf"
@@ -133,10 +141,62 @@ $echapper = static function (?string $valeur): string {
             </section>
 
             <div class="actions-gestion">
-                <a class="lien-retour-gestion" href="index.php?uc=produits">Retour au catalogue</a>
-                <button type="submit" class="bouton-inscription">Ajouter le produit</button>
+                <?php if ($modeModification): ?>
+                    <a class="lien-retour-gestion" href="index.php?uc=gestion_produits">Annuler la modification</a>
+                <?php else: ?>
+                    <a class="lien-retour-gestion" href="index.php?uc=produits">Retour au catalogue</a>
+                <?php endif; ?>
+                <button type="submit" class="bouton-inscription">
+                    <?= $modeModification ? 'Enregistrer les modifications' : 'Ajouter le produit' ?>
+                </button>
             </div>
         </form>
+
+        <section class="gestion-liste-produits" aria-labelledby="titre-liste-produits">
+            <h2 id="titre-liste-produits">Produits du catalogue</h2>
+            <?php if (!$produitsGestion): ?>
+                <p class="catalogue-vide">Aucun produit dans le catalogue.</p>
+            <?php else: ?>
+                <div class="table-produits-gestion">
+                    <?php foreach ($produitsGestion as $produit): ?>
+                        <article class="ligne-produit-gestion">
+                            <img
+                                src="includes/images/produits/<?= $echapper(basename($produit['image'])) ?>"
+                                alt=""
+                                loading="lazy"
+                            >
+                            <div class="details-produit-gestion">
+                                <h3><?= $echapper($produit['libelle']) ?></h3>
+                                <p>
+                                    <?= $echapper($produit['type_bois']) ?>
+                                    · <?= number_format((float) $produit['prix'], 2, ',', ' ') ?>&nbsp;€
+                                </p>
+                            </div>
+                            <a
+                                class="bouton-modifier-produit"
+                                href="index.php?uc=gestion_produits&amp;id=<?= (int) $produit['id'] ?>"
+                            >
+                                Modifier
+                            </a>
+                            <form
+                                method="post"
+                                action="index.php?uc=gestion_produits"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');"
+                            >
+                                <input type="hidden" name="action" value="supprimer">
+                                <input type="hidden" name="id_produit" value="<?= (int) $produit['id'] ?>">
+                                <input
+                                    type="hidden"
+                                    name="jeton_csrf"
+                                    value="<?= $echapper($_SESSION['jeton_csrf_gestion_produits']) ?>"
+                                >
+                                <button type="submit" class="bouton-supprimer-produit">Supprimer</button>
+                            </form>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
     </main>
     <script>
         const choixImageExistante = document.querySelector('[name="image_existante"]');

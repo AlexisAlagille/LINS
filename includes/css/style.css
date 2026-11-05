@@ -346,6 +346,85 @@ body {
     font-weight: 600;
 }
 
+.gestion-liste-produits {
+    margin-top: 40px;
+}
+
+.gestion-liste-produits > h2 {
+    margin: 0 0 18px;
+    color: var(--color-forest);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.65rem;
+    font-weight: 500;
+}
+
+.table-produits-gestion {
+    display: grid;
+    gap: 10px;
+}
+
+.ligne-produit-gestion {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-paper);
+}
+
+.ligne-produit-gestion > img {
+    width: 64px;
+    height: 56px;
+    border-radius: 3px;
+    background: var(--color-cream);
+    object-fit: contain;
+}
+
+.details-produit-gestion h3 {
+    margin: 0;
+    color: var(--color-forest);
+    font-size: 1rem;
+}
+
+.details-produit-gestion p {
+    margin: 5px 0 0;
+    color: var(--color-muted);
+    font-size: 0.88rem;
+}
+
+.bouton-modifier-produit,
+.bouton-supprimer-produit {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 13px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-forest);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.bouton-modifier-produit:hover {
+    background: var(--color-cream);
+}
+
+.bouton-supprimer-produit {
+    border-color: #d5afa2;
+    color: #8a382c;
+}
+
+.bouton-supprimer-produit:hover {
+    background: #f8eeea;
+}
+
 .catalogue-compte {
     margin: 0 0 16px;
     color: var(--color-muted);
@@ -493,11 +572,37 @@ body {
         width: 100%;
     }
 
+    .ligne-produit-gestion {
+        grid-template-columns: 52px minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .ligne-produit-gestion > img {
+        width: 52px;
+        height: 48px;
+    }
+
+    .ligne-produit-gestion > form {
+        grid-column: 2 / -1;
+    }
+
+    .bouton-modifier-produit,
+    .bouton-supprimer-produit {
+        width: 100%;
+    }
+
     .filtres-catalogue {
         grid-template-columns: 1fr;
         padding: 18px;
     }
 
+}
+
+@media (max-width: 760px) {
+    .formulaire-gestion {
+        grid-template-columns: 1fr;
+    }
 }
 
 .grille-produits {
