@@ -75,9 +75,13 @@ switch ($action) {
             }
             if ($donnees['nom'] === '' || strlen($donnees['nom']) > 100) {
                 $erreurs[] = 'Le nom est obligatoire et ne doit pas dépasser 100 caractères.';
+            } elseif (preg_match('/^\p{L}[\p{L}\p{M}]*(?:-\p{L}[\p{L}\p{M}]*)*$/u', $donnees['nom']) !== 1) {
+                $erreurs[] = 'Le nom ne peut contenir que des lettres et des tirets entre les lettres.';
             }
             if ($donnees['prenom'] === '' || strlen($donnees['prenom']) > 100) {
                 $erreurs[] = 'Le prénom est obligatoire et ne doit pas dépasser 100 caractères.';
+            } elseif (preg_match('/^\p{L}[\p{L}\p{M}]*$/u', $donnees['prenom']) !== 1) {
+                $erreurs[] = 'Le prénom ne peut contenir que des lettres.';
             }
             if (
                 $donnees['email'] === ''

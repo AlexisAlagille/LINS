@@ -9,6 +9,10 @@ La page d'inscription est accessible à l'adresse `index.php?uc=auth`. Elle util
 email en base de données. Le compte SQL configuré dans `includes/modele/connexion.php` doit
 avoir les droits de lecture et d'écriture sur cette base.
 
+La page d'administration des comptes utilise la colonne `user.date_creation`.
+Appliquer également `database/migrations/20261105_user_date_creation.sql` à la base
+avant de l'utiliser. Cette page est réservée au rôle `admin`.
+
 Les nouveaux mots de passe sont stockés avec `password_hash()`. L'authentification devra
 les vérifier avec `password_verify()`.
 

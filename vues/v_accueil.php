@@ -77,10 +77,6 @@ $echapper = static function (string $valeur): string {
 			<?php endif; ?>
 		</section>
 	</main>
-
-	<footer class="accueil-pied">
-		<a class="accueil-marque" href="index.php?uc=accueil">LINS</a>
-		<p>© <?= date('Y') ?> LINS · PRESBOIS</p>
-	</footer>
+	<?php require __DIR__ . '/v_footer.php'; ?>
 </body>
 </html>
