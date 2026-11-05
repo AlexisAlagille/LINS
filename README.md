@@ -29,3 +29,16 @@ n'existent pas. Une commande utilise le statut « en attente » ; son total est 
 des prix actuels du catalogue. Le client peut l’annuler tant qu’elle est « en attente »
 ou « validée » ; l’annulation supprime la commande et ses lignes de la base. Elle n’est
 plus possible une fois la commande expédiée. Le paiement et la livraison ne sont pas inclus.
+
+## Gestion du catalogue
+
+Un compte ayant le rôle `gestionnaire` peut ouvrir « Gestion catalogue » depuis la navigation
+pour ajouter ou modifier un produit. Il peut sélectionner une image JPEG, PNG ou WebP déjà
+présente dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
+La suppression d’un produit demande confirmation et est refusée si le produit figure déjà
+dans une commande, afin de préserver l’historique.
+Il peut aussi ajouter, modifier ou supprimer les catégories depuis « Gestion catégories ».
+La suppression d’une catégorie est refusée tant qu’un produit l’utilise.
+Pour choisir les produits affichés dans la section d’accueil, appliquer
+`database/migrations/20261105_produits_mis_en_avant.sql`, puis utiliser les boutons
+« Mettre en avant » de la gestion du catalogue. Jusqu’à six produits sélectionnés sont affichés.

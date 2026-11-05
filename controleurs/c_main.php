@@ -15,6 +15,8 @@ switch ($uc)
     case 'commandes' : { include "c_commandes.php" ; break ;}
     case 'monCompte' : { include "c_monCompte.php" ; break ;}
     case 'adminUtilisateurs' : { include "c_adminUtilisateur.php" ; break ;}
+    case 'gestion_produits' : { include "c_gestion_produits.php" ; break ;}
+    case 'gestion_categories' : { include "c_gestion_categories.php" ; break ;}
 }
 
 ?>

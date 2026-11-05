@@ -89,7 +89,11 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
 {
     $limite = max(1, min($limite, 12));
     $requete = $bdd->prepare(
-        'SELECT id, libelle, prix, description FROM produit ORDER BY id DESC LIMIT ?'
+        'SELECT id, libelle, prix, description, image
+         FROM produit
+         WHERE mis_en_avant = 1
+         ORDER BY id DESC
+         LIMIT ?'
     );
     $requete->execute([$limite]);
 
@@ -153,6 +157,152 @@ function getTypesBois(PDO $bdd): array
     $requete = $bdd->query('SELECT id, libelle FROM type_bois ORDER BY libelle');
 
     return $requete->fetchAll();
+}
+
+function getTypeBois(PDO $bdd, int $idTypeBois): ?array
+{
+    $requete = $bdd->prepare('SELECT id, libelle FROM type_bois WHERE id = ?');
+    $requete->execute([$idTypeBois]);
+    $typeBois = $requete->fetch();
+
+    return $typeBois ?: null;
+}
+
+function ajouterTypeBois(PDO $bdd, string $libelle): void
+{
+    $requete = $bdd->prepare('INSERT INTO type_bois (libelle) VALUES (?)');
+    $requete->execute([$libelle]);
+}
+
+function modifierTypeBois(PDO $bdd, int $idTypeBois, string $libelle): bool
+{
+    $requete = $bdd->prepare('UPDATE type_bois SET libelle = ? WHERE id = ?');
+    $requete->execute([$libelle, $idTypeBois]);
+
+    return $requete->rowCount() > 0 || getTypeBois($bdd, $idTypeBois) !== null;
+}
+
+function supprimerTypeBois(PDO $bdd, int $idTypeBois): bool
+{
+    $verifierProduits = $bdd->prepare('SELECT COUNT(*) FROM produit WHERE id_type_bois = ?');
+    $verifierProduits->execute([$idTypeBois]);
+    if ((int) $verifierProduits->fetchColumn() > 0) {
+        throw new InvalidArgumentException(
+            'Cette catégorie est utilisée par des produits et ne peut pas être supprimée.'
+        );
+    }
+
+    $requete = $bdd->prepare('DELETE FROM type_bois WHERE id = ?');
+    $requete->execute([$idTypeBois]);
+
+    return $requete->rowCount() === 1;
+}
+
+function ajouterProduit(
+    PDO $bdd,
+    string $libelle,
+    float $prix,
+    string $description,
+    string $image,
+    int $idTypeBois
+): void {
+    $verifierType = $bdd->prepare('SELECT id FROM type_bois WHERE id = ?');
+    $verifierType->execute([$idTypeBois]);
+    if ($verifierType->fetchColumn() === false) {
+        throw new InvalidArgumentException('Le type de bois sélectionné n’existe pas.');
+    }
+
+    $requete = $bdd->prepare(
+        'INSERT INTO produit (libelle, prix, description, image, id_type_bois)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+    $requete->execute([$libelle, $prix, $description, $image, $idTypeBois]);
+}
+
+function getProduitGestion(PDO $bdd, int $idProduit): ?array
+{
+    $requete = $bdd->prepare(
+        'SELECT id, libelle, prix, description, image, id_type_bois
+         FROM produit
+         WHERE id = ?'
+    );
+    $requete->execute([$idProduit]);
+    $produit = $requete->fetch();
+
+    return $produit ?: null;
+}
+
+function getProduitsGestion(PDO $bdd): array
+{
+    $requete = $bdd->query(
+        'SELECT produit.id, produit.libelle, produit.prix, produit.description,
+                produit.image, produit.id_type_bois, produit.mis_en_avant,
+                type_bois.libelle AS type_bois
+         FROM produit
+         JOIN type_bois ON type_bois.id = produit.id_type_bois
+         ORDER BY produit.libelle'
+    );
+
+    return $requete->fetchAll();
+}
+
+function definirProduitMisEnAvant(PDO $bdd, int $idProduit, bool $misEnAvant): bool
+{
+    $requete = $bdd->prepare(
+        'UPDATE produit SET mis_en_avant = ? WHERE id = ?'
+    );
+    $requete->execute([$misEnAvant ? 1 : 0, $idProduit]);
+
+    return $requete->rowCount() > 0 || getProduitGestion($bdd, $idProduit) !== null;
+}
+
+function modifierProduit(
+    PDO $bdd,
+    int $idProduit,
+    string $libelle,
+    float $prix,
+    string $description,
+    string $image,
+    int $idTypeBois
+): bool {
+    $verifierType = $bdd->prepare('SELECT id FROM type_bois WHERE id = ?');
+    $verifierType->execute([$idTypeBois]);
+    if ($verifierType->fetchColumn() === false) {
+        throw new InvalidArgumentException('Le type de bois sélectionné n’existe pas.');
+    }
+
+    $requete = $bdd->prepare(
+        'UPDATE produit
+         SET libelle = ?, prix = ?, description = ?, image = ?, id_type_bois = ?
+         WHERE id = ?'
+    );
+    $requete->execute([$libelle, $prix, $description, $image, $idTypeBois, $idProduit]);
+
+    return $requete->rowCount() > 0 || getProduitGestion($bdd, $idProduit) !== null;
+}
+
+function supprimerProduit(PDO $bdd, int $idProduit): bool
+{
+    $verifierProduit = $bdd->prepare('SELECT id FROM produit WHERE id = ?');
+    $verifierProduit->execute([$idProduit]);
+    if ($verifierProduit->fetchColumn() === false) {
+        return false;
+    }
+
+    $verifierCommandes = $bdd->prepare(
+        'SELECT COUNT(*) FROM ligne_commande WHERE id_produit = ?'
+    );
+    $verifierCommandes->execute([$idProduit]);
+    if ((int) $verifierCommandes->fetchColumn() > 0) {
+        throw new InvalidArgumentException(
+            'Ce produit figure dans une commande et ne peut pas être supprimé afin de préserver l’historique.'
+        );
+    }
+
+    $requete = $bdd->prepare('DELETE FROM produit WHERE id = ?');
+    $requete->execute([$idProduit]);
+
+    return $requete->rowCount() === 1;
 }
 
 function getProduitsParIds(PDO $bdd, array $ids): array
