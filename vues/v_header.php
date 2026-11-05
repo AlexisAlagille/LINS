@@ -10,7 +10,7 @@ $menusParRole = [
         ['Tableau de bord', 'index.php?uc=accueil'],
         ['Produits', 'index.php?uc=produits'],
         ['Commandes', 'index.php?uc=commandes'],
-        ['Utilisateurs', 'index.php?uc=utilisateurs'],
+        ['Utilisateurs', 'index.php?uc=adminUtilisateurs'],
     ],
 ];
 
