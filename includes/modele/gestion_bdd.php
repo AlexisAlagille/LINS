@@ -155,6 +155,27 @@ function getTypesBois(PDO $bdd): array
     return $requete->fetchAll();
 }
 
+function ajouterProduit(
+    PDO $bdd,
+    string $libelle,
+    float $prix,
+    string $description,
+    string $image,
+    int $idTypeBois
+): void {
+    $verifierType = $bdd->prepare('SELECT id FROM type_bois WHERE id = ?');
+    $verifierType->execute([$idTypeBois]);
+    if ($verifierType->fetchColumn() === false) {
+        throw new InvalidArgumentException('Le type de bois sélectionné n’existe pas.');
+    }
+
+    $requete = $bdd->prepare(
+        'INSERT INTO produit (libelle, prix, description, image, id_type_bois)
+         VALUES (?, ?, ?, ?, ?)'
+    );
+    $requete->execute([$libelle, $prix, $description, $image, $idTypeBois]);
+}
+
 function getProduitsParIds(PDO $bdd, array $ids): array
 {
     $requete = $bdd->prepare('SELECT id, libelle, prix, description FROM produit WHERE id = ?');

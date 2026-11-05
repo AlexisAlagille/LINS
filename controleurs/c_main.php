@@ -13,6 +13,7 @@ switch ($uc)
     case 'produits' : { include "c_produits.php" ; break ;}
     case 'panier' : { include "c_panier.php" ; break ;}
     case 'commandes' : { include "c_commandes.php" ; break ;}
+    case 'gestion_produits' : { include "c_gestion_produits.php" ; break ;}
 }
 
 ?>

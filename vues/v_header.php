@@ -12,6 +12,11 @@ $menusParRole = [
         ['Commandes', 'index.php?uc=commandes'],
         ['Utilisateurs', 'index.php?uc=utilisateurs'],
     ],
+    'gestionnaire' => [
+        ['Tableau de bord', 'index.php?uc=accueil'],
+        ['Produits', 'index.php?uc=produits'],
+        ['Gestion catalogue', 'index.php?uc=gestion_produits'],
+    ],
 ];
 
 $roleConnecte = $_SESSION['role'] ?? '';

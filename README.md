@@ -25,3 +25,9 @@ n'existent pas. Une commande utilise le statut « en attente » ; son total est 
 des prix actuels du catalogue. Le client peut l’annuler tant qu’elle est « en attente »
 ou « validée » ; l’annulation supprime la commande et ses lignes de la base. Elle n’est
 plus possible une fois la commande expédiée. Le paiement et la livraison ne sont pas inclus.
+
+## Gestion du catalogue
+
+Un compte ayant le rôle `gestionnaire` peut ouvrir « Gestion catalogue » depuis la navigation
+pour ajouter un produit. Il peut sélectionner une image JPEG, PNG ou WebP déjà présente
+dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
