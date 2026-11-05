@@ -1,4 +1,12 @@
 <?php
+$modeModificationCategorie ??= false;
+$messageGestionCategorie ??= '';
+$erreurGestionCategorie ??= '';
+$libelleCategorie ??= '';
+$categorieEnCours = is_array($categorieEnCours ?? null) ? $categorieEnCours : [];
+$idCategorieEnCours = (int) ($categorieEnCours['id'] ?? 0);
+$categories ??= [];
+
 $echapper = static function (?string $valeur): string {
     return htmlspecialchars($valeur ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
@@ -36,7 +44,7 @@ $echapper = static function (?string $valeur): string {
             >
             <input type="hidden" name="action" value="<?= $modeModificationCategorie ? 'modifier' : 'ajouter' ?>">
             <?php if ($modeModificationCategorie): ?>
-                <input type="hidden" name="id_categorie" value="<?= (int) $categorieEnCours['id'] ?>">
+                <input type="hidden" name="id_categorie" value="<?= $idCategorieEnCours ?>">
             <?php endif; ?>
 
             <label class="champ champ-gestion">
@@ -94,8 +102,56 @@ $echapper = static function (?string $valeur): string {
                         </article>
                     <?php endforeach; ?>
                 </div>
+                <nav
+                    id="pagination-gestion-categories"
+                    class="pagination-catalogue"
+                    aria-label="Pages des catégories"
+                    hidden
+                ></nav>
             <?php endif; ?>
         </section>
     </main>
+    <script>
+        const listeCategoriesGestion = document.querySelector('.table-produits-gestion');
+
+        if (listeCategoriesGestion) {
+            const categories = Array.from(listeCategoriesGestion.querySelectorAll('.ligne-categorie-gestion'));
+            const paginationCategories = document.querySelector('#pagination-gestion-categories');
+            const categoriesParPage = 10;
+            let pageCategories = 1;
+            const nombrePages = Math.ceil(categories.length / categoriesParPage);
+
+            function afficherPageCategories() {
+                const debutPage = (pageCategories - 1) * categoriesParPage;
+                categories.forEach((categorie, index) => {
+                    categorie.hidden = index < debutPage || index >= debutPage + categoriesParPage;
+                });
+
+                paginationCategories.replaceChildren();
+                paginationCategories.hidden = nombrePages <= 1;
+                for (let numeroPage = 1; numeroPage <= nombrePages; numeroPage++) {
+                    if (numeroPage === pageCategories) {
+                        const pageActuelle = document.createElement('span');
+                        pageActuelle.textContent = numeroPage;
+                        pageActuelle.setAttribute('aria-current', 'page');
+                        paginationCategories.append(pageActuelle);
+                        continue;
+                    }
+
+                    const boutonPage = document.createElement('button');
+                    boutonPage.type = 'button';
+                    boutonPage.textContent = numeroPage;
+                    boutonPage.setAttribute('aria-label', 'Page ' + numeroPage);
+                    boutonPage.addEventListener('click', () => {
+                        pageCategories = numeroPage;
+                        afficherPageCategories();
+                    });
+                    paginationCategories.append(boutonPage);
+                }
+            }
+
+            afficherPageCategories();
+        }
+    </script>
 </body>
 </html>

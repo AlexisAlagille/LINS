@@ -444,6 +444,10 @@ body {
     display: none;
 }
 
+.ligne-categorie-gestion[hidden] {
+    display: none;
+}
+
 .table-produits-gestion {
     display: grid;
     gap: 10px;
@@ -666,7 +670,12 @@ body {
     margin-top: 32px;
 }
 
+.pagination-catalogue[hidden] {
+    display: none;
+}
+
 .pagination-catalogue a,
+.pagination-catalogue button,
 .pagination-catalogue span {
     display: inline-flex;
     min-width: 40px;
@@ -677,14 +686,25 @@ body {
     border: 1px solid var(--color-border);
     background: var(--color-paper);
     color: var(--color-forest);
+    font: inherit;
     text-decoration: none;
 }
 
 .pagination-catalogue a:hover,
+.pagination-catalogue button:hover,
 .pagination-catalogue span[aria-current="page"] {
     border-color: var(--color-forest);
     background: var(--color-forest);
     color: #fff;
+}
+
+.pagination-catalogue button {
+    cursor: pointer;
+}
+
+.pagination-catalogue button:focus-visible {
+    outline: 3px solid rgb(138 101 61 / 20%);
+    outline-offset: 3px;
 }
 
 @media (max-width: 600px) {
@@ -721,11 +741,11 @@ body {
 
     .ligne-produit-gestion > form,
     .ligne-produit-gestion > .bouton-modifier-produit {
-        grid-column: 2;
+        grid-column: 1 / -1;
     }
 
     .ligne-produit-gestion > .form-mise-en-avant {
-        width: min(190px, 100%);
+        width: 100%;
     }
 
     .ligne-categorie-gestion {
@@ -866,7 +886,7 @@ body {
     line-height: 1.55;
 }
 
-.produit-prix {
+.grille-produits .produit-prix {
     margin-top: auto;
     margin-bottom: 20px;
     padding-top: 16px;

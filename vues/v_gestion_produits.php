@@ -1,4 +1,20 @@
 <?php
+$modeModification ??= false;
+$messageGestionProduit ??= '';
+$erreurGestionProduit ??= '';
+$produitEnCours = is_array($produitEnCours ?? null) ? $produitEnCours : [];
+$idProduitEnCours = (int) ($produitEnCours['id'] ?? 0);
+$donneesProduit ??= [
+    'libelle' => '',
+    'prix' => '',
+    'description' => '',
+    'id_type_bois' => '',
+    'image_existante' => '',
+];
+$typesBois ??= [];
+$imagesExistantes ??= [];
+$produitsGestion ??= [];
+
 $echapper = static function (?string $valeur): string {
     return htmlspecialchars($valeur ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
@@ -41,14 +57,14 @@ $echapper = static function (?string $valeur): string {
             </summary>
         <form
             method="post"
-            action="index.php?uc=gestion_produits<?= $modeModification ? '&amp;id=' . (int) $produitEnCours['id'] : '' ?>"
+            action="index.php?uc=gestion_produits<?= $modeModification ? '&amp;id=' . $idProduitEnCours : '' ?>"
             class="formulaire-gestion"
             enctype="multipart/form-data"
         >
             <input type="hidden" name="MAX_FILE_SIZE" value="2097152">
             <input type="hidden" name="action" value="<?= $modeModification ? 'modifier' : 'ajouter' ?>">
             <?php if ($modeModification): ?>
-                <input type="hidden" name="id_produit" value="<?= (int) $produitEnCours['id'] ?>">
+                <input type="hidden" name="id_produit" value="<?= $idProduitEnCours ?>">
             <?php endif; ?>
             <input
                 type="hidden"
@@ -268,6 +284,12 @@ $echapper = static function (?string $valeur): string {
                         </article>
                     <?php endforeach; ?>
                 </div>
+                <nav
+                    id="pagination-gestion-produits"
+                    class="pagination-catalogue"
+                    aria-label="Pages des produits"
+                    hidden
+                ></nav>
                 <p id="aucun-produit-filtre" class="catalogue-vide" hidden>
                     Aucun produit ne correspond à ces critères.
                 </p>
@@ -283,12 +305,44 @@ $echapper = static function (?string $valeur): string {
             const filtreMiseEnAvant = document.querySelector('#mise-en-avant-gestion-produit');
             const compteGestionProduits = document.querySelector('#compte-gestion-produits');
             const aucunProduitFiltre = document.querySelector('#aucun-produit-filtre');
+            const paginationProduits = document.querySelector('#pagination-gestion-produits');
+            const produitsParPage = 10;
+            let pageProduits = 1;
+
+            function afficherPaginationProduits(nombrePages) {
+                paginationProduits.replaceChildren();
+                paginationProduits.hidden = nombrePages <= 1;
+
+                if (nombrePages <= 1) {
+                    return;
+                }
+
+                for (let numeroPage = 1; numeroPage <= nombrePages; numeroPage++) {
+                    if (numeroPage === pageProduits) {
+                        const pageActuelle = document.createElement('span');
+                        pageActuelle.textContent = numeroPage;
+                        pageActuelle.setAttribute('aria-current', 'page');
+                        paginationProduits.append(pageActuelle);
+                        continue;
+                    }
+
+                    const boutonPage = document.createElement('button');
+                    boutonPage.type = 'button';
+                    boutonPage.textContent = numeroPage;
+                    boutonPage.setAttribute('aria-label', 'Page ' + numeroPage);
+                    boutonPage.addEventListener('click', () => {
+                        pageProduits = numeroPage;
+                        filtrerProduitsGestion();
+                    });
+                    paginationProduits.append(boutonPage);
+                }
+            }
 
             function filtrerProduitsGestion() {
                 const recherche = rechercheGestionProduits.value.trim().toLocaleLowerCase('fr');
                 const typeBois = filtreTypeGestionProduits.value;
                 const miseEnAvant = filtreMiseEnAvant.value;
-                let nombreVisible = 0;
+                const produitsCorrespondants = [];
 
                 listeProduitsGestion.querySelectorAll('.ligne-produit-gestion').forEach((produit) => {
                     const correspondRecherche = produit.dataset.recherche
@@ -296,22 +350,42 @@ $echapper = static function (?string $valeur): string {
                     const correspondType = typeBois === '0' || produit.dataset.typeBois === typeBois;
                     const correspondMiseEnAvant = miseEnAvant === 'tous'
                         || produit.dataset.misEnAvant === miseEnAvant;
-                    const afficher = correspondRecherche && correspondType && correspondMiseEnAvant;
 
-                    produit.hidden = !afficher;
-                    if (afficher) {
-                        nombreVisible++;
+                    if (correspondRecherche && correspondType && correspondMiseEnAvant) {
+                        produitsCorrespondants.push(produit);
                     }
                 });
 
-                compteGestionProduits.textContent = nombreVisible
-                    + ' produit' + (nombreVisible > 1 ? 's' : '');
-                aucunProduitFiltre.hidden = nombreVisible !== 0;
+                const nombrePages = Math.ceil(produitsCorrespondants.length / produitsParPage);
+                pageProduits = Math.min(pageProduits, Math.max(nombrePages, 1));
+                const debutPage = (pageProduits - 1) * produitsParPage;
+                const produitsDeLaPage = new Set(
+                    produitsCorrespondants.slice(debutPage, debutPage + produitsParPage)
+                );
+
+                listeProduitsGestion.querySelectorAll('.ligne-produit-gestion').forEach((produit) => {
+                    produit.hidden = !produitsDeLaPage.has(produit);
+                });
+
+                compteGestionProduits.textContent = produitsCorrespondants.length
+                    + ' produit' + (produitsCorrespondants.length > 1 ? 's' : '');
+                aucunProduitFiltre.hidden = produitsCorrespondants.length !== 0;
+                afficherPaginationProduits(nombrePages);
             }
 
-            rechercheGestionProduits.addEventListener('input', filtrerProduitsGestion);
-            filtreTypeGestionProduits.addEventListener('change', filtrerProduitsGestion);
-            filtreMiseEnAvant.addEventListener('change', filtrerProduitsGestion);
+            rechercheGestionProduits.addEventListener('input', () => {
+                pageProduits = 1;
+                filtrerProduitsGestion();
+            });
+            filtreTypeGestionProduits.addEventListener('change', () => {
+                pageProduits = 1;
+                filtrerProduitsGestion();
+            });
+            filtreMiseEnAvant.addEventListener('change', () => {
+                pageProduits = 1;
+                filtrerProduitsGestion();
+            });
+            filtrerProduitsGestion();
 
             listeProduitsGestion.addEventListener('submit', async (evenement) => {
                 const formulaire = evenement.target.closest('.form-mise-en-avant');
