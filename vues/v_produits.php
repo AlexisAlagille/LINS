@@ -1,5 +1,5 @@
 <?php
-/** @var list<array{id: int|string, libelle: string, prix: string, description: ?string, type_bois: ?string}> $produits */
+/** @var list<array{id: int|string, libelle: string, prix: string, description: ?string, image: string, type_bois: ?string}> $produits */
 /** @var string $erreurCatalogue */
 /** @var string $jetonCsrfPanier */
 
@@ -41,33 +41,10 @@ $echapper = static function (?string $valeur): string {
 
             <section class="grille-produits" aria-label="Tous les produits">
                 <?php foreach ($produits as $produit): ?>
-                    <?php
-                    $nomProduit = strtolower($produit['libelle']);
-                    $image = 'structurel.png';
-
-                    if (strpos($nomProduit, 'particules') !== false) {
-                        $image = 'particules.png';
-
-                    } elseif (strpos($nomProduit, 'mdf') !== false) {
-                        if (strpos($nomProduit, 'hydrofuge') !== false) {
-                            $image = 'mdf-hydrofuge.png';
-
-                        } elseif (strpos($nomProduit, 'laqu') !== false) {
-                            $image = 'mdf-laque-blanc.png';
-
-                        } else {
-                            $image = 'mdf.png';
-                        }
-
-                    } elseif (strpos($nomProduit, 'osb') !== false) {
-                        $image = 'osb.png';
-                    }
-                    ?>
-
                     <article class="carte-produit">
                         <img
                             class="produit-image"
-                            src="includes/images/produits/<?= $echapper($image) ?>"
+                            src="includes/images/produits/<?= $echapper(basename($produit['image'])) ?>"
                             alt="<?= $echapper($produit['libelle']) ?>"
                             loading="lazy"
                         >
