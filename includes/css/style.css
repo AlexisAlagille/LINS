@@ -1754,7 +1754,7 @@ d
 	padding: 76px max(24px, calc((100% - 1120px) / 2));
 	background-image:
 		linear-gradient(90deg, rgb(13 29 20 / 82%) 0%, rgb(13 29 20 / 58%) 58%, rgb(13 29 20 / 24%) 100%),
-		url("img/foret.jpg");
+		url("../images/foret.jpg");
 	background-position: center;
 	background-size: cover;
 }
