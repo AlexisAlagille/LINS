@@ -50,6 +50,22 @@ $echapper = static function (?string $valeur): string {
                             <?php endforeach; ?>
                         </ul>
                         <p class="total-commande">Total : <strong><?= number_format((float) $commande['total'], 2, ',', ' ') ?>&nbsp;€</strong></p>
+                        <?php if (($_SESSION['role'] ?? '') === 'client' && in_array($commande['statut'], ['en attente', 'validée'], true)): ?>
+                            <form
+                                method="post"
+                                action="index.php?uc=commandes"
+                                onsubmit="return confirm('Voulez-vous vraiment annuler cette commande ?');"
+                            >
+                                <input type="hidden" name="action" value="annuler">
+                                <input type="hidden" name="id_commande" value="<?= (int) $commande['id'] ?>">
+                                <input
+                                    type="hidden"
+                                    name="jeton_csrf"
+                                    value="<?= $echapper($_SESSION['jeton_csrf_commandes']) ?>"
+                                >
+                                <button type="submit" class="bouton-annuler-commande">Annuler la commande</button>
+                            </form>
+                        <?php endif; ?>
                     </article>
                 <?php endforeach; ?>
             </section>

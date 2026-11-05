@@ -270,6 +270,69 @@ function getCommandes(PDO $bdd, ?int $idUtilisateur = null): array
     return $requete->fetchAll();
 }
 
+function annulerCommande(PDO $bdd, int $idCommande, int $idUtilisateur): bool
+{
+    $requeteStatuts = $bdd->prepare(
+        'SELECT id, libelle FROM statut WHERE libelle IN (?, ?)'
+    );
+    $requeteStatuts->execute(['en attente', 'validée']);
+
+    $idsStatutsAnnulables = [];
+    foreach ($requeteStatuts->fetchAll() as $statut) {
+        $idsStatutsAnnulables[$statut['libelle']] = (int) $statut['id'];
+    }
+
+    if (!isset($idsStatutsAnnulables['en attente'], $idsStatutsAnnulables['validée'])) {
+        throw new RuntimeException('Les statuts nécessaires à l’annulation sont absents de la base.');
+    }
+
+    $bdd->beginTransaction();
+    try {
+        $verifierCommande = $bdd->prepare(
+            'SELECT id FROM commande
+             WHERE id = ? AND id_client = ? AND id_statut IN (?, ?)'
+             . ($bdd->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql' ? ' FOR UPDATE' : '')
+        );
+        $verifierCommande->execute([
+            $idCommande,
+            $idUtilisateur,
+            $idsStatutsAnnulables['en attente'],
+            $idsStatutsAnnulables['validée'],
+        ]);
+
+        if ($verifierCommande->fetchColumn() === false) {
+            $bdd->rollBack();
+            return false;
+        }
+
+        $supprimerLignes = $bdd->prepare('DELETE FROM ligne_commande WHERE id_commande = ?');
+        $supprimerLignes->execute([$idCommande]);
+
+        $supprimerCommande = $bdd->prepare(
+            'DELETE FROM commande
+             WHERE id = ? AND id_client = ? AND id_statut IN (?, ?)'
+        );
+        $supprimerCommande->execute([
+            $idCommande,
+            $idUtilisateur,
+            $idsStatutsAnnulables['en attente'],
+            $idsStatutsAnnulables['validée'],
+        ]);
+
+        if ($supprimerCommande->rowCount() !== 1) {
+            throw new RuntimeException('La commande n’a pas pu être supprimée.');
+        }
+
+        $bdd->commit();
+        return true;
+    } catch (Throwable $e) {
+        if ($bdd->inTransaction()) {
+            $bdd->rollBack();
+        }
+        throw $e;
+    }
+}
+
 function getLignesCommandes(PDO $bdd, array $idsCommandes): array
 {
     $lignesParCommande = [];

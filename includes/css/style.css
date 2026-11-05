@@ -619,6 +619,21 @@ body {
     color: var(--color-muted);
 }
 
+.bouton-annuler-commande {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid #a34a3b;
+    border-radius: 4px;
+    background: transparent;
+    color: #8a382c;
+    cursor: pointer;
+    font: inherit;
+}
+
+.bouton-annuler-commande:hover {
+    background: #f8eeea;
+}
+
 .carte-commande ul {
     display: grid;
     gap: 8px;
