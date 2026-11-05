@@ -421,6 +421,12 @@ body {
     font-weight: 600;
 }
 
+.bouton-secondaire {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
 .bouton-secondaire:hover,
 .bouton-lien:hover {
     background: #eee5d7;

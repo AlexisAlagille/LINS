@@ -49,8 +49,9 @@ $totalPanier = 0.0;
                 <?php foreach ($produitsPanier as $idProduit => $produit): ?>
                     <?php
                     $quantite = (int) ($_SESSION['panier'][$idProduit] ?? 0);
-                    $sousTotal = (float) $produit['prix'] * $quantite;
-                    $totalPanier += $sousTotal;
+                    $prixEnCentimes = (int) round((float) $produit['prix'] * 100);
+                    $sousTotalEnCentimes = $prixEnCentimes * $quantite;
+                    $totalPanier += $sousTotalEnCentimes;
                     ?>
                     <div class="ligne-panier">
                         <strong><?= $echapper($produit['libelle']) ?></strong>
@@ -62,10 +63,13 @@ $totalPanier = 0.0;
                                 name="quantites[<?= (int) $idProduit ?>]"
                                 min="1"
                                 value="<?= $quantite ?>"
+                                data-prix-centimes="<?= $prixEnCentimes ?>"
                                 required
                             >
                         </label>
-                        <strong><?= number_format($sousTotal, 2, ',', ' ') ?>&nbsp;€</strong>
+                        <strong class="sous-total">
+                            <?= number_format($sousTotalEnCentimes / 100, 2, ',', ' ') ?>&nbsp;€
+                        </strong>
                         <button
                             type="submit"
                             name="retirer"
@@ -75,18 +79,49 @@ $totalPanier = 0.0;
                     </div>
                 <?php endforeach; ?>
                 <div class="resume-panier">
-                    <button type="submit" name="action" value="modifier" class="bouton-secondaire">
-                        Mettre à jour les quantités
-                    </button>
+                    <a href="index.php?uc=produits" class="bouton-secondaire">
+                        Continuer mes achats
+                    </a>
 
                     <button type="submit" name="action" value="commander" class="bouton-inscription">
                         Valider la commande
                     </button>
 
-                    <p>Total estimé : <strong><?= number_format($totalPanier, 2, ',', ' ') ?>&nbsp;€</strong></p>
+                    <p>
+                        Total estimé :
+                        <strong id="total-panier" aria-live="polite">
+                            <?= number_format($totalPanier / 100, 2, ',', ' ') ?>&nbsp;€
+                        </strong>
+                    </p>
                 </div>
             </form>
         <?php endif; ?>
     </main>
+    <script>
+        const formatPrix = new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        function mettreAJourPrix() {
+            let total = 0;
+
+            document.querySelectorAll('input[name^="quantites["]').forEach((champ) => {
+                const quantite = Number(champ.value) || 0;
+                const sousTotal = Number(champ.dataset.prixCentimes) * quantite;
+                total += sousTotal;
+
+                champ.closest('.ligne-panier').querySelector('.sous-total').textContent =
+                    formatPrix.format(sousTotal / 100) + ' €';
+            });
+
+            document.querySelector('#total-panier').textContent =
+                formatPrix.format(total / 100) + ' €';
+        }
+
+        document.querySelectorAll('input[name^="quantites["]').forEach((champ) => {
+            champ.addEventListener('input', mettreAJourPrix);
+        });
+    </script>
 </body>
 </html>
