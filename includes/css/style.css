@@ -390,6 +390,15 @@ body {
     font-weight: 500;
 }
 
+.filtres-gestion-produits {
+    grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(170px, 220px));
+    margin-bottom: 14px;
+}
+
+.ligne-produit-gestion[hidden] {
+    display: none;
+}
+
 .table-produits-gestion {
     display: grid;
     gap: 10px;

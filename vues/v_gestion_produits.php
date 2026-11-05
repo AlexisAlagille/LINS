@@ -157,9 +157,53 @@ $echapper = static function (?string $valeur): string {
             <?php if (!$produitsGestion): ?>
                 <p class="catalogue-vide">Aucun produit dans le catalogue.</p>
             <?php else: ?>
+                <form class="filtres-catalogue filtres-gestion-produits" id="filtres-gestion-produits">
+                    <div class="filtre-recherche">
+                        <label for="recherche-gestion-produit">Rechercher un produit</label>
+                        <div class="champ-recherche">
+                            <span aria-hidden="true">⌕</span>
+                            <input
+                                id="recherche-gestion-produit"
+                                type="search"
+                                placeholder="Nom ou description"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="filtre-type">
+                        <label for="type-gestion-produit">Type de bois</label>
+                        <select id="type-gestion-produit">
+                            <option value="0">Tous les types</option>
+                            <?php foreach ($typesBois as $type): ?>
+                                <option value="<?= (int) $type['id'] ?>">
+                                    <?= $echapper($type['libelle']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="filtre-mise-en-avant">
+                        <label for="mise-en-avant-gestion-produit">Mise en avant</label>
+                        <select id="mise-en-avant-gestion-produit">
+                            <option value="tous">Tous les produits</option>
+                            <option value="oui">Mis en avant</option>
+                            <option value="non">Non mis en avant</option>
+                        </select>
+                    </div>
+                </form>
+
+                <p id="compte-gestion-produits" class="catalogue-compte" role="status" aria-live="polite">
+                    <?= count($produitsGestion) ?> produit<?= count($produitsGestion) > 1 ? 's' : '' ?>
+                </p>
                 <div class="table-produits-gestion">
                     <?php foreach ($produitsGestion as $produit): ?>
-                        <article class="ligne-produit-gestion">
+                        <article
+                            class="ligne-produit-gestion"
+                            data-recherche="<?= $echapper($produit['libelle'] . ' ' . ($produit['description'] ?? '')) ?>"
+                            data-type-bois="<?= (int) $produit['id_type_bois'] ?>"
+                            data-mis-en-avant="<?= (int) $produit['mis_en_avant'] === 1 ? 'oui' : 'non' ?>"
+                        >
                             <img
                                 src="includes/images/produits/<?= $echapper(basename($produit['image'])) ?>"
                                 alt=""
@@ -216,6 +260,9 @@ $echapper = static function (?string $valeur): string {
                         </article>
                     <?php endforeach; ?>
                 </div>
+                <p id="aucun-produit-filtre" class="catalogue-vide" hidden>
+                    Aucun produit ne correspond à ces critères.
+                </p>
             <?php endif; ?>
         </section>
     </main>
@@ -223,6 +270,41 @@ $echapper = static function (?string $valeur): string {
         const listeProduitsGestion = document.querySelector('.table-produits-gestion');
 
         if (listeProduitsGestion) {
+            const rechercheGestionProduits = document.querySelector('#recherche-gestion-produit');
+            const filtreTypeGestionProduits = document.querySelector('#type-gestion-produit');
+            const filtreMiseEnAvant = document.querySelector('#mise-en-avant-gestion-produit');
+            const compteGestionProduits = document.querySelector('#compte-gestion-produits');
+            const aucunProduitFiltre = document.querySelector('#aucun-produit-filtre');
+
+            function filtrerProduitsGestion() {
+                const recherche = rechercheGestionProduits.value.trim().toLocaleLowerCase('fr');
+                const typeBois = filtreTypeGestionProduits.value;
+                const miseEnAvant = filtreMiseEnAvant.value;
+                let nombreVisible = 0;
+
+                listeProduitsGestion.querySelectorAll('.ligne-produit-gestion').forEach((produit) => {
+                    const correspondRecherche = produit.dataset.recherche
+                        .toLocaleLowerCase('fr').includes(recherche);
+                    const correspondType = typeBois === '0' || produit.dataset.typeBois === typeBois;
+                    const correspondMiseEnAvant = miseEnAvant === 'tous'
+                        || produit.dataset.misEnAvant === miseEnAvant;
+                    const afficher = correspondRecherche && correspondType && correspondMiseEnAvant;
+
+                    produit.hidden = !afficher;
+                    if (afficher) {
+                        nombreVisible++;
+                    }
+                });
+
+                compteGestionProduits.textContent = nombreVisible
+                    + ' produit' + (nombreVisible > 1 ? 's' : '');
+                aucunProduitFiltre.hidden = nombreVisible !== 0;
+            }
+
+            rechercheGestionProduits.addEventListener('input', filtrerProduitsGestion);
+            filtreTypeGestionProduits.addEventListener('change', filtrerProduitsGestion);
+            filtreMiseEnAvant.addEventListener('change', filtrerProduitsGestion);
+
             listeProduitsGestion.addEventListener('submit', async (evenement) => {
                 const formulaire = evenement.target.closest('.form-mise-en-avant');
                 if (!formulaire) {
@@ -257,15 +339,17 @@ $echapper = static function (?string $valeur): string {
                     }
 
                     const misEnAvant = resultat.mis_en_avant;
+                    const ligneProduit = formulaire.closest('.ligne-produit-gestion');
                     formulaire.querySelector('[name="action"]').value = misEnAvant
                         ? 'retirer_mise_en_avant'
                         : 'mettre_en_avant';
                     bouton.textContent = misEnAvant ? 'Retirer de l’accueil' : 'Mettre en avant';
-                    formulaire.closest('.ligne-produit-gestion')
-                        .querySelector('.statut-mise-en-avant').textContent = misEnAvant
-                            ? 'Mis en avant sur l’accueil'
-                            : 'Non mis en avant';
+                    ligneProduit.dataset.misEnAvant = misEnAvant ? 'oui' : 'non';
+                    ligneProduit.querySelector('.statut-mise-en-avant').textContent = misEnAvant
+                        ? 'Mis en avant sur l’accueil'
+                        : 'Non mis en avant';
                     retour.textContent = '';
+                    filtrerProduitsGestion();
                 } catch (erreur) {
                     retour.textContent = erreur.message || 'La mise à jour a échoué. Réessaie.';
                 } finally {

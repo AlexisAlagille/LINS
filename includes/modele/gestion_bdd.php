@@ -235,8 +235,9 @@ function getProduitGestion(PDO $bdd, int $idProduit): ?array
 function getProduitsGestion(PDO $bdd): array
 {
     $requete = $bdd->query(
-        'SELECT produit.id, produit.libelle, produit.prix, produit.image,
-                produit.mis_en_avant, type_bois.libelle AS type_bois
+        'SELECT produit.id, produit.libelle, produit.prix, produit.description,
+                produit.image, produit.id_type_bois, produit.mis_en_avant,
+                type_bois.libelle AS type_bois
          FROM produit
          JOIN type_bois ON type_bois.id = produit.id_type_bois
          ORDER BY produit.libelle'
