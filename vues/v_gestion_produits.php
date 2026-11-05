@@ -297,6 +297,52 @@ $echapper = static function (?string $valeur): string {
         </section>
     </main>
     <script>
+        const panneauFormulaireProduit = document.querySelector('.panneau-formulaire-produit');
+
+        if (panneauFormulaireProduit) {
+            const resumeFormulaireProduit = panneauFormulaireProduit.querySelector('summary');
+            let animationFormulaireEnCours = false;
+
+            resumeFormulaireProduit.addEventListener('click', async (evenement) => {
+                evenement.preventDefault();
+                if (animationFormulaireEnCours) {
+                    return;
+                }
+
+                animationFormulaireEnCours = true;
+                const duree = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 320;
+                const ouverture = !panneauFormulaireProduit.open;
+                panneauFormulaireProduit.style.overflow = 'hidden';
+
+                if (ouverture) {
+                    const hauteurFermee = resumeFormulaireProduit.offsetHeight;
+                    panneauFormulaireProduit.open = true;
+                    const hauteurOuverte = panneauFormulaireProduit.offsetHeight;
+                    const animationPanneau = panneauFormulaireProduit.animate(
+                        [{ height: hauteurFermee + 'px' }, { height: hauteurOuverte + 'px' }],
+                        { duration: duree, easing: 'cubic-bezier(0.2, 0.7, 0.25, 1)' }
+                    );
+
+                    await animationPanneau.finished;
+                    animationPanneau.cancel();
+                } else {
+                    const hauteurOuverte = panneauFormulaireProduit.offsetHeight;
+                    const hauteurFermee = resumeFormulaireProduit.offsetHeight;
+                    const animationPanneau = panneauFormulaireProduit.animate(
+                        [{ height: hauteurOuverte + 'px' }, { height: hauteurFermee + 'px' }],
+                        { duration: duree, easing: 'cubic-bezier(0.2, 0.7, 0.25, 1)' }
+                    );
+
+                    await animationPanneau.finished;
+                    panneauFormulaireProduit.open = false;
+                    animationPanneau.cancel();
+                }
+
+                panneauFormulaireProduit.style.overflow = '';
+                animationFormulaireEnCours = false;
+            });
+        }
+
         const listeProduitsGestion = document.querySelector('.table-produits-gestion');
 
         if (listeProduitsGestion) {
