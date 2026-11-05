@@ -96,15 +96,62 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
     return $requete->fetchAll();
 }
 
-function getTousLesProduits(PDO $bdd): array
+function getTousLesProduits(
+    PDO $bdd,
+    int $limite,
+    int $decalage,
+    string $recherche,
+    int $idTypeBois
+): array
 {
-    $requete = $bdd->query(
+    $requete = $bdd->prepare(
         'SELECT produit.id, produit.libelle, produit.prix, produit.description, produit.image,
                 type_bois.libelle AS type_bois
          FROM produit
          LEFT JOIN type_bois ON type_bois.id = produit.id_type_bois
-         ORDER BY type_bois.libelle, produit.libelle'
+         WHERE (? = \'\' OR produit.libelle LIKE ? OR produit.description LIKE ?)
+         AND (? = 0 OR produit.id_type_bois = ?)
+         ORDER BY type_bois.libelle, produit.libelle
+         LIMIT ? OFFSET ?'
     );
+    $motRecherche = '%' . $recherche . '%';
+    $requete->execute([
+        $recherche,
+        $motRecherche,
+        $motRecherche,
+        $idTypeBois,
+        $idTypeBois,
+        $limite,
+        $decalage,
+    ]);
+
+    return $requete->fetchAll();
+}
+
+function compterProduits(PDO $bdd, string $recherche, int $idTypeBois): int
+{
+    $requete = $bdd->prepare(
+        'SELECT COUNT(*)
+         FROM produit
+         WHERE (? = \'\' OR libelle LIKE ? OR description LIKE ?)
+         AND (? = 0 OR id_type_bois = ?)'
+    );
+    $motRecherche = '%' . $recherche . '%';
+    $requete->execute([
+        $recherche,
+        $motRecherche,
+        $motRecherche,
+        $idTypeBois,
+        $idTypeBois,
+    ]);
+
+    return (int) $requete->fetchColumn();
+}
+
+function getTypesBois(PDO $bdd): array
+{
+    $requete = $bdd->query('SELECT id, libelle FROM type_bois ORDER BY libelle');
+
     return $requete->fetchAll();
 }
 
