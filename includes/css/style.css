@@ -231,6 +231,51 @@ body {
     box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
 }
 
+.panneau-formulaire-produit {
+    margin-bottom: 32px;
+}
+
+.panneau-formulaire-produit > summary {
+    position: relative;
+    padding: 16px 48px 16px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-paper);
+    color: var(--color-forest);
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+}
+
+.panneau-formulaire-produit > summary::-webkit-details-marker {
+    display: none;
+}
+
+.panneau-formulaire-produit > summary::after {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    color: var(--color-bark);
+    content: "+";
+    font-size: 1.4rem;
+    line-height: 1;
+    transform: translateY(-50%);
+}
+
+.panneau-formulaire-produit[open] > summary {
+    margin-bottom: 14px;
+    border-color: var(--color-bark);
+}
+
+.panneau-formulaire-produit[open] > summary::after {
+    content: "−";
+}
+
+.panneau-formulaire-produit > summary:focus-visible {
+    outline: 3px solid rgb(138 101 61 / 20%);
+    outline-offset: 3px;
+}
+
 .formulaire-categorie {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

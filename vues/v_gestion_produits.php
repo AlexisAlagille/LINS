@@ -32,6 +32,13 @@ $echapper = static function (?string $valeur): string {
             <p class="message message-erreur" role="alert"><?= $echapper($erreurGestionProduit) ?></p>
         <?php endif; ?>
 
+        <details
+            class="panneau-formulaire-produit"
+            <?= $modeModification || $erreurGestionProduit !== '' ? 'open' : '' ?>
+        >
+            <summary>
+                <?= $modeModification ? 'Modifier le produit' : 'Ajouter un produit' ?>
+            </summary>
         <form
             method="post"
             action="index.php?uc=gestion_produits<?= $modeModification ? '&amp;id=' . (int) $produitEnCours['id'] : '' ?>"
@@ -151,6 +158,7 @@ $echapper = static function (?string $valeur): string {
                 </button>
             </div>
         </form>
+        </details>
 
         <section class="gestion-liste-produits" aria-labelledby="titre-liste-produits">
             <h2 id="titre-liste-produits">Produits du catalogue</h2>
