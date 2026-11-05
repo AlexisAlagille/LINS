@@ -261,6 +261,14 @@ body {
     animation-delay: 350ms;
 }
 
+.carte-produit:nth-child(7) {
+    animation-delay: 420ms;
+}
+
+.carte-produit:nth-child(8) {
+    animation-delay: 490ms;
+}
+
 .carte-produit:hover {
     translate: 0 -7px;
     border-color: #b89a72;
