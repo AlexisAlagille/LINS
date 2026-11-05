@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['message_panier'] = 'Le produit a été retiré du panier.';
                     break;
 
-                case 'modifier':
+                case 'continuer':
                     $saisies = $_POST['quantites'] ?? [];
                     if (!is_array($saisies)) {
                         $erreurPanier = 'Quantités invalides.';
@@ -61,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if ($erreurPanier === '') {
                         $_SESSION['panier'] = $nouvellesQuantites;
-                        $_SESSION['message_panier'] = 'Les quantités ont été mises à jour.';
+                        header('Location: index.php?uc=produits');
+                        exit;
                     }
                     break;
 

@@ -79,9 +79,9 @@ $totalPanier = 0.0;
                     </div>
                 <?php endforeach; ?>
                 <div class="resume-panier">
-                    <a href="index.php?uc=produits" class="bouton-secondaire">
+                    <button type="submit" name="action" value="continuer" class="bouton-secondaire">
                         Continuer mes achats
-                    </a>
+                    </button>
 
                     <button type="submit" name="action" value="commander" class="bouton-inscription">
                         Valider la commande
