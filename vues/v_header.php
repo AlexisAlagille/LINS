@@ -15,6 +15,10 @@ $menusParRole = [
     ],
     'gestionnaire' => [
         ['Gestion des commandes', 'index.php?uc=gestionCommandes'],
+        ['Tableau de bord', 'index.php?uc=accueil'],
+        ['Produits', 'index.php?uc=produits'],
+        ['Gestion catalogue', 'index.php?uc=gestion_produits'],
+        ['Gestion catégories', 'index.php?uc=gestion_categories'],
     ],
 ];
 

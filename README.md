@@ -33,3 +33,16 @@ plus possible une fois la commande expédiée. Le paiement et la livraison ne so
 Le rôle `gestionnaire` accède à `index.php?uc=gestionCommandes` pour consulter les commandes,
 les filtrer par statut et mettre à jour leur statut parmi les quatre valeurs de la table
 `statut`.
+
+## Gestion du catalogue
+
+Un compte ayant le rôle `gestionnaire` peut ouvrir « Gestion catalogue » depuis la navigation
+pour ajouter ou modifier un produit. Il peut sélectionner une image JPEG, PNG ou WebP déjà
+présente dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
+La suppression d’un produit demande confirmation et est refusée si le produit figure déjà
+dans une commande, afin de préserver l’historique.
+Il peut aussi ajouter, modifier ou supprimer les catégories depuis « Gestion catégories ».
+La suppression d’une catégorie est refusée tant qu’un produit l’utilise.
+Pour choisir les produits affichés dans la section d’accueil, appliquer
+`database/migrations/20261105_produits_mis_en_avant.sql`, puis utiliser les boutons
+« Mettre en avant » de la gestion du catalogue. Jusqu’à six produits sélectionnés sont affichés.

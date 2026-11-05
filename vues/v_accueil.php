@@ -48,20 +48,25 @@ $echapper = static function (string $valeur): string {
 			<div class="accueil-section-entete">
 				<div>
 					<p class="sur-titre">À découvrir</p>
-					<h2 id="titre-catalogue">Nos produits</h2>
+					<h2 id="titre-catalogue">Nos produits mis en avant</h2>
 				</div>
-				<p>Une sélection issue de notre catalogue.</p>
+				<p>Une sélection choisie par notre équipe.</p>
 			</div>
 
 			<?php if ($erreurCatalogue !== ''): ?>
 				<p class="accueil-etat" role="status"><?= $echapper($erreurCatalogue) ?></p>
 			<?php elseif (!$produits): ?>
-				<p class="accueil-etat">Aucun produit n'est disponible pour le moment.</p>
+				<p class="accueil-etat">Aucun produit n’est mis en avant pour le moment.</p>
 			<?php else: ?>
 				<div class="produits-grille">
 					<?php foreach ($produits as $produit): ?>
 						<article class="produit-item">
-							<p class="produit-reference">Référence #<?= (int) $produit['id'] ?></p>
+							<img
+								class="produit-image-accueil"
+								src="includes/images/produits/<?= $echapper(basename((string) $produit['image'])) ?>"
+								alt=""
+								loading="lazy"
+							>
 							<h3><?= $echapper((string) $produit['libelle']) ?></h3>
 							<?php if (!empty($produit['description'])): ?>
 								<p class="produit-description">
