@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../includes/modele/gestion_bdd.php';
 
 $emailGestionnaire = $_SESSION['email'] ?? null;
+$roleSession = $_SESSION['role'] ?? null;
 if (
     !is_string($emailGestionnaire)
-    || ($_SESSION['role'] ?? null) !== 'gestionnaire'
-    || getUserRole($bdd, $emailGestionnaire) !== 'gestionnaire'
+    || !in_array($roleSession, ['admin', 'gestionnaire'], true)
+    || getUserRole($bdd, $emailGestionnaire) !== $roleSession
 ) {
     header('Location: index.php?uc=auth&action=login');
     exit;

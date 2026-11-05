@@ -8,17 +8,14 @@ $menusParRole = [
         ['Mon compte', 'index.php?uc=monCompte'],
     ],
     'admin' => [
-        ['Tableau de bord', 'index.php?uc=accueil'],
-        ['Produits', 'index.php?uc=produits'],
-        ['Commandes', 'index.php?uc=commandes'],
-        ['Utilisateurs', 'index.php?uc=adminUtilisateurs'],
+        ['Gérer les commandes', 'index.php?uc=gestionCommandes'],
+        ['Gérer le catalogue', 'index.php?uc=gestion_produits'],
+        ['Gérer les comptes utilisateurs', 'index.php?uc=adminUtilisateurs'],
     ],
     'gestionnaire' => [
-        ['Gestion des commandes', 'index.php?uc=gestionCommandes'],
-        ['Tableau de bord', 'index.php?uc=accueil'],
-        ['Produits', 'index.php?uc=produits'],
-        ['Gestion catalogue', 'index.php?uc=gestion_produits'],
-        ['Gestion catégories', 'index.php?uc=gestion_categories'],
+        ['Gérer les commandes', 'index.php?uc=gestionCommandes'],
+        ['Gérer le catalogue', 'index.php?uc=gestion_produits'],
+        ['Gérer les catégories', 'index.php?uc=gestion_categories'],
     ],
 ];
 

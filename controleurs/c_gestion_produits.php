@@ -1,7 +1,7 @@
 <?php
-if (($_SESSION['role'] ?? '') !== 'gestionnaire') {
+if (!in_array($_SESSION['role'] ?? '', ['admin', 'gestionnaire'], true)) {
     http_response_code(403);
-    exit('Cette page est réservée au gestionnaire.');
+    exit('Cette page est réservée à l’administration et au gestionnaire.');
 }
 
 $_SESSION['jeton_csrf_gestion_produits'] ??= bin2hex(random_bytes(32));
