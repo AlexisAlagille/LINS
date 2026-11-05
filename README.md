@@ -26,4 +26,6 @@ Le panier est conservé dans la session du client connecté. Pour activer l'enre
 commandes, les tables `commande`, `ligne_commande` et `statut` doivent exister dans la base
 `lins`. La migration `database/migrations/20261105_panier_commandes.sql` les crée si elles
 n'existent pas. Une commande utilise le statut « en attente » ; son total est calculé à partir
-des prix actuels du catalogue. Le paiement et la livraison ne sont pas inclus.
+des prix actuels du catalogue. Le client peut l’annuler tant qu’elle est « en attente »
+ou « validée » ; l’annulation supprime la commande et ses lignes de la base. Elle n’est
+plus possible une fois la commande expédiée. Le paiement et la livraison ne sont pas inclus.
