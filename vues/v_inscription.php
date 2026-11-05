@@ -118,5 +118,6 @@ $echapper = static function (string $valeur): string {
             </form>
         </section>
     </main>
+    <?php require __DIR__ . '/v_footer.php'; ?>
 </body>
 </html>
