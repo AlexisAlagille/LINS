@@ -1,4 +1,12 @@
 <?php
+/**
+ * @var list<string> $erreurs
+ * @var string $messageSucces
+ * @var array{nom: string, prenom: string, email: string} $donnees
+ */
+$jetonCsrf = isset($_SESSION['jeton_csrf_mon_compte']) && is_string($_SESSION['jeton_csrf_mon_compte'])
+    ? $_SESSION['jeton_csrf_mon_compte']
+    : '';
 $echapper = static function (string $valeur): string {
     return htmlspecialchars($valeur, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
@@ -42,7 +50,7 @@ $echapper = static function (string $valeur): string {
                 <input
                     type="hidden"
                     name="jeton_csrf"
-                    value="<?= $echapper($_SESSION['jeton_csrf_mon_compte']) ?>"
+                    value="<?= $echapper($jetonCsrf) ?>"
                 >
 
                 <div class="grille-champs">

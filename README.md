@@ -29,3 +29,7 @@ n'existent pas. Une commande utilise le statut « en attente » ; son total est 
 des prix actuels du catalogue. Le client peut l’annuler tant qu’elle est « en attente »
 ou « validée » ; l’annulation supprime la commande et ses lignes de la base. Elle n’est
 plus possible une fois la commande expédiée. Le paiement et la livraison ne sont pas inclus.
+
+Le rôle `gestionnaire` accède à `index.php?uc=gestionCommandes` pour consulter les commandes,
+les filtrer par statut et mettre à jour leur statut parmi les quatre valeurs de la table
+`statut`.

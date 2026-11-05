@@ -13,6 +13,9 @@ $menusParRole = [
         ['Commandes', 'index.php?uc=commandes'],
         ['Utilisateurs', 'index.php?uc=adminUtilisateurs'],
     ],
+    'gestionnaire' => [
+        ['Gestion des commandes', 'index.php?uc=gestionCommandes'],
+    ],
 ];
 
 $roleConnecte = $_SESSION['role'] ?? '';
