@@ -231,6 +231,38 @@ body {
     box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
 }
 
+.formulaire-categorie {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 28px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-paper);
+    box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
+}
+
+.formulaire-categorie .actions-gestion {
+    grid-column: auto;
+}
+
+.ligne-categorie-gestion {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-paper);
+}
+
+.ligne-categorie-gestion h3 {
+    margin: 0;
+    color: var(--color-forest);
+    font-size: 1rem;
+}
+
 .informations-produit,
 .images-produit {
     display: grid;
@@ -585,6 +617,16 @@ body {
 
     .ligne-produit-gestion > form {
         grid-column: 2 / -1;
+    }
+
+    .ligne-categorie-gestion {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .ligne-categorie-gestion > form {
+        grid-column: 1 / -1;
     }
 
     .bouton-modifier-produit,

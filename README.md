@@ -33,3 +33,5 @@ pour ajouter ou modifier un produit. Il peut sélectionner une image JPEG, PNG o
 présente dans `includes/images/produits`, ou téléverser une nouvelle image de 2 Mo maximum.
 La suppression d’un produit demande confirmation et est refusée si le produit figure déjà
 dans une commande, afin de préserver l’historique.
+Il peut aussi ajouter, modifier ou supprimer les catégories depuis « Gestion catégories ».
+La suppression d’une catégorie est refusée tant qu’un produit l’utilise.

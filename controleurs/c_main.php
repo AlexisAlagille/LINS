@@ -14,6 +14,7 @@ switch ($uc)
     case 'panier' : { include "c_panier.php" ; break ;}
     case 'commandes' : { include "c_commandes.php" ; break ;}
     case 'gestion_produits' : { include "c_gestion_produits.php" ; break ;}
+    case 'gestion_categories' : { include "c_gestion_categories.php" ; break ;}
 }
 
 ?>
