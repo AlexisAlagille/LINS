@@ -1,29 +1,12 @@
 <?php
-/** @var list<array{libelle: string, prix: string, description: ?string, type_bois: ?string}> $produits */
+/** @var list<array{id: int|string, libelle: string, prix: string, description: ?string, type_bois: ?string}> $produits */
 /** @var string $erreurCatalogue */
+/** @var string $jetonCsrfPanier */
+
+$role = $_SESSION['role'] ?? '';
+
 $echapper = static function (?string $valeur): string {
     return htmlspecialchars($valeur ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-};
-$imageProduit = static function (string $libelle): string {
-    $nom = strtolower($libelle);
-
-    if (strpos($nom, 'particules') !== false) {
-        return 'includes/images/produits/particules.png';
-    }
-    if (strpos($nom, 'mdf') !== false) {
-        if (strpos($nom, 'hydrofuge') !== false) {
-            return 'includes/images/produits/mdf-hydrofuge.png';
-        }
-        if (strpos($nom, 'laqu') !== false) {
-            return 'includes/images/produits/mdf-laque-blanc.png';
-        }
-        return 'includes/images/produits/mdf.png';
-    }
-    if (strpos($nom, 'osb') !== false) {
-        return 'includes/images/produits/osb.png';
-    }
-
-    return 'includes/images/produits/structurel.png';
 };
 ?>
 <!DOCTYPE html>
@@ -39,38 +22,91 @@ $imageProduit = static function (string $libelle): string {
     <main class="catalogue">
         <header class="catalogue-entete">
             <p class="catalogue-sur-titre">La sélection LINS</p>
+
             <h1>Nos produits</h1>
+
             <p>Découvrez notre gamme de panneaux et de matériaux bois.</p>
         </header>
 
         <?php if ($erreurCatalogue !== ''): ?>
             <p class="message message-erreur" role="alert"><?= $echapper($erreurCatalogue) ?></p>
+
         <?php elseif (!$produits): ?>
             <p class="catalogue-vide">Aucun produit n’est disponible pour le moment.</p>
+
         <?php else: ?>
             <p class="catalogue-compte">
                 <?= count($produits) ?> produit<?= count($produits) > 1 ? 's' : '' ?>
             </p>
+
             <section class="grille-produits" aria-label="Tous les produits">
                 <?php foreach ($produits as $produit): ?>
+                    <?php
+                    $nomProduit = strtolower($produit['libelle']);
+                    $image = 'structurel.png';
+
+                    if (strpos($nomProduit, 'particules') !== false) {
+                        $image = 'particules.png';
+
+                    } elseif (strpos($nomProduit, 'mdf') !== false) {
+                        if (strpos($nomProduit, 'hydrofuge') !== false) {
+                            $image = 'mdf-hydrofuge.png';
+
+                        } elseif (strpos($nomProduit, 'laqu') !== false) {
+                            $image = 'mdf-laque-blanc.png';
+
+                        } else {
+                            $image = 'mdf.png';
+                        }
+
+                    } elseif (strpos($nomProduit, 'osb') !== false) {
+                        $image = 'osb.png';
+                    }
+                    ?>
+
                     <article class="carte-produit">
                         <img
                             class="produit-image"
-                            src="<?= $echapper($imageProduit($produit['libelle'])) ?>"
+                            src="includes/images/produits/<?= $echapper($image) ?>"
                             alt="<?= $echapper($produit['libelle']) ?>"
                             loading="lazy"
                         >
+
                         <?php if ($produit['type_bois'] !== null): ?>
                             <p class="produit-categorie"><?= $echapper($produit['type_bois']) ?></p>
                         <?php endif; ?>
+
                         <h2><?= $echapper($produit['libelle']) ?></h2>
+
                         <?php if ($produit['description'] !== null && $produit['description'] !== ''): ?>
                             <p class="produit-description"><?= $echapper($produit['description']) ?></p>
                         <?php endif; ?>
+
                         <p class="produit-prix">
                             <?= number_format((float) $produit['prix'], 2, ',', ' ') ?>&nbsp;€
                         </p>
+
+                        <?php if ($role === 'client'): ?>
+                            <form method="post" action="index.php?uc=panier" class="formulaire-ajout-panier">
+                                <input type="hidden" name="action" value="ajouter">
+                                <input type="hidden" name="id_produit" value="<?= (int) $produit['id'] ?>">
+
+                                <input
+                                    type="hidden"
+                                    name="jeton_csrf"
+                                    value="<?= $echapper($jetonCsrfPanier) ?>"
+                                >
+
+                                <button type="submit" class="bouton-inscription">Ajouter au panier</button>
+                            </form>
+
+                        <?php elseif ($role === ''): ?>
+                            <p class="produit-connexion">
+                                <a href="index.php?uc=auth">Connectez-vous pour commander</a>
+                            </p>
+                        <?php endif; ?>
                     </article>
+
                 <?php endforeach; ?>
             </section>
         <?php endif; ?>

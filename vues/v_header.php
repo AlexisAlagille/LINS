@@ -3,6 +3,7 @@ $menusParRole = [
     'client' => [
         ['Accueil', 'index.php?uc=accueil'],
         ['Nos produits', 'index.php?uc=produits'],
+        ['Panier', 'index.php?uc=panier'],
         ['Mes commandes', 'index.php?uc=commandes'],
     ],
     'admin' => [
@@ -14,6 +15,14 @@ $menusParRole = [
 ];
 
 $roleConnecte = $_SESSION['role'] ?? '';
+$nombreArticlesPanier = 0;
+if (isset($_SESSION['panier']) && is_array($_SESSION['panier'])) {
+    foreach ($_SESSION['panier'] as $quantite) {
+        if (is_int($quantite) && $quantite > 0) {
+            $nombreArticlesPanier += $quantite;
+        }
+    }
+}
 
 if (!is_string($roleConnecte) || !isset($menusParRole[$roleConnecte])) {
     return;
@@ -44,7 +53,9 @@ if (empty($_SESSION['jeton_csrf_deconnexion'])) {
                     href="<?= htmlspecialchars($destination, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"
                     <?= $pageActive ? 'aria-current="page"' : '' ?>
                 >
-                    <?= htmlspecialchars($libelle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+                    <?= htmlspecialchars($libelle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?><?php if ($libelle === 'Panier'): ?>
+                        <span class="compteur-panier">(<?= $nombreArticlesPanier ?>)</span>
+                    <?php endif; ?>
                 </a>
             <?php endforeach; ?>
         </nav>

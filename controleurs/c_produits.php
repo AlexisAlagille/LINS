@@ -1,5 +1,12 @@
 <?php
 $erreurCatalogue = '';
+$jetonCsrfPanier = '';
+
+switch ($_SESSION['role'] ?? '') {
+    case 'client':
+        $jetonCsrfPanier = $_SESSION['jeton_csrf_panier'] ??= bin2hex(random_bytes(32));
+        break;
+}
 
 try {
     $produits = getTousLesProduits($bdd);

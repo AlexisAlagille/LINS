@@ -79,7 +79,7 @@ function verifierConnexion(PDO $bdd, string $email, string $motdepasse): bool
 		'SELECT password FROM user WHERE email = ? LIMIT 1'
 	);
 	$requete->execute([$email]);
-	$utilisateur = $requete->fetch(PDO::FETCH_ASSOC);
+	$utilisateur = $requete->fetch();
 
 	return is_array($utilisateur)
 		&& password_verify($motdepasse, $utilisateur["password"]);
@@ -89,10 +89,9 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
 {
     $limite = max(1, min($limite, 12));
     $requete = $bdd->prepare(
-        'SELECT id, libelle, prix, description FROM produit ORDER BY id DESC LIMIT :limite'
+        'SELECT id, libelle, prix, description FROM produit ORDER BY id DESC LIMIT ?'
     );
-    $requete->bindValue(':limite', $limite, PDO::PARAM_INT);
-    $requete->execute();
+    $requete->execute([$limite]);
 
     return $requete->fetchAll();
 }
@@ -100,10 +99,144 @@ function listerProduitsAccueil(PDO $bdd, int $limite = 6): array
 function getTousLesProduits(PDO $bdd): array
 {
     $requete = $bdd->query(
-        'SELECT produit.libelle, produit.prix, produit.description, type_bois.libelle AS type_bois
+        'SELECT produit.id, produit.libelle, produit.prix, produit.description, type_bois.libelle AS type_bois
          FROM produit
          LEFT JOIN type_bois ON type_bois.id = produit.id_type_bois
          ORDER BY type_bois.libelle, produit.libelle'
     );
-    return $requete->fetchAll(PDO::FETCH_ASSOC);
+    return $requete->fetchAll();
+}
+
+function getProduitsParIds(PDO $bdd, array $ids): array
+{
+    $requete = $bdd->prepare('SELECT id, libelle, prix, description FROM produit WHERE id = ?');
+    $produits = [];
+
+    foreach ($ids as $id) {
+        $requete->execute([$id]);
+        $produit = $requete->fetch();
+
+        if ($produit) {
+            $produits[(int) $produit['id']] = $produit;
+        }
+    }
+
+    return $produits;
+}
+
+function getIdUtilisateur(PDO $bdd, string $email): int
+{
+    $requete = $bdd->prepare('SELECT id FROM user WHERE email = ? LIMIT 1');
+    $requete->execute([$email]);
+    $idUtilisateur = $requete->fetchColumn();
+
+    if ($idUtilisateur === false) {
+        throw new RuntimeException('Le compte client est introuvable.');
+    }
+
+    return (int) $idUtilisateur;
+}
+
+function creerCommande(PDO $bdd, int $idUtilisateur, array $articles): int
+{
+    if (!$articles) {
+        throw new InvalidArgumentException('Le panier est vide.');
+    }
+
+    foreach ($articles as $idProduit => $quantite) {
+        if (!is_int($idProduit) || $idProduit < 1 || !is_int($quantite) || $quantite < 1) {
+            throw new InvalidArgumentException('Le contenu du panier est invalide.');
+        }
+    }
+
+    $produits = getProduitsParIds($bdd, array_keys($articles));
+    if (count($produits) !== count($articles)) {
+        throw new InvalidArgumentException('Un produit du panier n’est plus disponible. Actualisez le panier.');
+    }
+
+    $requete = $bdd->prepare('SELECT id FROM statut WHERE libelle = ?');
+    $requete->execute(['en attente']);
+    $idStatut = $requete->fetchColumn();
+
+    if ($idStatut === false) {
+        throw new RuntimeException('Le statut « en attente » est absent de la base.');
+    }
+
+    // Enregistrer la commande et ses lignes ensemble.
+    $bdd->beginTransaction();
+    try {
+        $insertionCommande = $bdd->prepare(
+            'INSERT INTO commande (id_client, id_statut) VALUES (?, ?)'
+        );
+        $insertionCommande->execute([$idUtilisateur, $idStatut]);
+        $idCommande = (int) $bdd->lastInsertId();
+
+        $insertionLigne = $bdd->prepare(
+            'INSERT INTO ligne_commande (id_commande, id_produit, qteProduit)
+             VALUES (?, ?, ?)'
+        );
+        foreach ($articles as $idProduit => $quantite) {
+            $insertionLigne->execute([$idCommande, $idProduit, $quantite]);
+        }
+
+        $bdd->commit();
+        return $idCommande;
+    } catch (Throwable $e) {
+        if ($bdd->inTransaction()) {
+            $bdd->rollBack();
+        }
+        throw $e;
+    }
+}
+
+function getCommandes(PDO $bdd, ?int $idUtilisateur = null): array
+{
+    if ($idUtilisateur !== null) {
+        $requete = $bdd->prepare(
+            'SELECT commande.id, statut.libelle AS statut, commande.date_commande, user.email,
+                    COALESCE(SUM(produit.prix * ligne_commande.qteProduit), 0) AS total
+             FROM commande
+             JOIN user ON user.id = commande.id_client
+             JOIN statut ON statut.id = commande.id_statut
+             LEFT JOIN ligne_commande ON ligne_commande.id_commande = commande.id
+             LEFT JOIN produit ON produit.id = ligne_commande.id_produit
+             WHERE commande.id_client = ?
+             GROUP BY commande.id, statut.libelle, commande.date_commande, user.email
+             ORDER BY commande.date_commande DESC, commande.id DESC'
+        );
+        $requete->execute([$idUtilisateur]);
+    } else {
+        $requete = $bdd->query(
+            'SELECT commande.id, statut.libelle AS statut, commande.date_commande, user.email,
+                    COALESCE(SUM(produit.prix * ligne_commande.qteProduit), 0) AS total
+             FROM commande
+             JOIN user ON user.id = commande.id_client
+             JOIN statut ON statut.id = commande.id_statut
+             LEFT JOIN ligne_commande ON ligne_commande.id_commande = commande.id
+             LEFT JOIN produit ON produit.id = ligne_commande.id_produit
+             GROUP BY commande.id, statut.libelle, commande.date_commande, user.email
+             ORDER BY commande.date_commande DESC, commande.id DESC'
+        );
+    }
+
+    return $requete->fetchAll();
+}
+
+function getLignesCommandes(PDO $bdd, array $idsCommandes): array
+{
+    $lignesParCommande = [];
+    $requete = $bdd->prepare(
+        'SELECT ligne_commande.id_commande, produit.libelle AS libelle_produit,
+                produit.prix AS prix_unitaire, ligne_commande.qteProduit AS quantite
+         FROM ligne_commande
+         JOIN produit ON produit.id = ligne_commande.id_produit
+         WHERE id_commande = ?
+         ORDER BY ligne_commande.id_produit'
+    );
+    foreach ($idsCommandes as $idCommande) {
+        $requete->execute([$idCommande]);
+        $lignesParCommande[$idCommande] = $requete->fetchAll();
+    }
+
+    return $lignesParCommande;
 }
