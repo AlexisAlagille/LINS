@@ -1095,6 +1095,172 @@ body {
   text-align: right;
 }
 
+.gestion-commandes {
+    width: min(100% - 40px, 1240px);
+    min-height: calc(100vh - 82px);
+    margin: 0 auto;
+    padding: 48px 0 72px;
+}
+
+.gestion-commandes-entete {
+    margin-bottom: 26px;
+    padding: 30px clamp(22px, 4vw, 40px);
+    border-radius: 5px;
+    background: var(--color-forest);
+    color: var(--color-cream);
+}
+
+.gestion-commandes-entete .catalogue-sur-titre {
+    margin: 0 0 8px;
+    color: #d7c09d;
+}
+
+.gestion-commandes-entete h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+}
+
+.filtre-commandes {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 18px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-paper);
+}
+
+.filtre-commandes label,
+.formulaire-statut-commande label {
+    color: var(--color-forest);
+    font-weight: 600;
+}
+
+.filtre-commandes select,
+.formulaire-statut-commande select {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #cfc4b2;
+    border-radius: 4px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+}
+
+.filtre-commandes select {
+    min-width: 220px;
+}
+
+.filtre-commandes .bouton-inscription,
+.formulaire-statut-commande .bouton-inscription {
+    min-height: 44px;
+    padding: 0 18px;
+}
+
+.tableau-gestion-commandes-conteneur {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-paper);
+}
+
+.tableau-gestion-commandes {
+    width: 100%;
+    min-width: 960px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tableau-gestion-commandes th,
+.tableau-gestion-commandes td {
+    padding: 14px 15px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: top;
+}
+
+.tableau-gestion-commandes th {
+    background: #f3eee4;
+    color: var(--color-bark-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.tableau-gestion-commandes tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tableau-gestion-commandes tbody tr:nth-child(even) {
+    background: #fcfaf6;
+}
+
+.tableau-gestion-commandes td:nth-child(2) small {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-muted);
+}
+
+.detail-gestion-commande summary {
+    color: var(--color-forest);
+    cursor: pointer;
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-color: var(--color-bark);
+    text-underline-offset: 3px;
+}
+
+.detail-gestion-commande ul {
+    min-width: 300px;
+    padding-left: 18px;
+    color: var(--color-muted);
+    line-height: 1.6;
+}
+
+.formulaire-statut-commande {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+}
+
+.formulaire-statut-commande label {
+    width: 100%;
+    font-size: 0.88rem;
+}
+
+.gestion-commandes select:focus-visible,
+.gestion-commandes button:focus-visible,
+.detail-gestion-commande summary:focus-visible {
+    outline: 3px solid rgb(138 101 61 / 24%);
+    outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+    .gestion-commandes {
+        width: min(100% - 28px, 1240px);
+        padding: 28px 0 48px;
+    }
+
+    .gestion-commandes-entete {
+        padding: 24px 20px;
+    }
+
+    .filtre-commandes {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filtre-commandes select,
+    .filtre-commandes .bouton-inscription {
+        width: 100%;
+    }
+}
+
 .texte-visuellement-cache {
   position: absolute;
   width: 1px;

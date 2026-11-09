@@ -391,7 +391,8 @@ function getCommandes(PDO $bdd, ?int $idUtilisateur = null): array
 {
     if ($idUtilisateur !== null) {
         $requete = $bdd->prepare(
-            'SELECT commande.id, statut.libelle AS statut, commande.date_commande, user.email,
+            'SELECT commande.id, commande.id_statut, statut.libelle AS statut, commande.date_commande,
+                    user.nom AS nom_client, user.prenom AS prenom_client, user.email,
                     COALESCE(SUM(produit.prix * ligne_commande.qteProduit), 0) AS total
              FROM commande
              JOIN user ON user.id = commande.id_client
@@ -399,20 +400,23 @@ function getCommandes(PDO $bdd, ?int $idUtilisateur = null): array
              LEFT JOIN ligne_commande ON ligne_commande.id_commande = commande.id
              LEFT JOIN produit ON produit.id = ligne_commande.id_produit
              WHERE commande.id_client = ?
-             GROUP BY commande.id, statut.libelle, commande.date_commande, user.email
+             GROUP BY commande.id, commande.id_statut, statut.libelle, commande.date_commande,
+                      user.nom, user.prenom, user.email
              ORDER BY commande.date_commande DESC, commande.id DESC'
         );
         $requete->execute([$idUtilisateur]);
     } else {
         $requete = $bdd->query(
-            'SELECT commande.id, statut.libelle AS statut, commande.date_commande, user.email,
+            'SELECT commande.id, commande.id_statut, statut.libelle AS statut, commande.date_commande,
+                    user.nom AS nom_client, user.prenom AS prenom_client, user.email,
                     COALESCE(SUM(produit.prix * ligne_commande.qteProduit), 0) AS total
              FROM commande
              JOIN user ON user.id = commande.id_client
              JOIN statut ON statut.id = commande.id_statut
              LEFT JOIN ligne_commande ON ligne_commande.id_commande = commande.id
              LEFT JOIN produit ON produit.id = ligne_commande.id_produit
-             GROUP BY commande.id, statut.libelle, commande.date_commande, user.email
+             GROUP BY commande.id, commande.id_statut, statut.libelle, commande.date_commande,
+                      user.nom, user.prenom, user.email
              ORDER BY commande.date_commande DESC, commande.id DESC'
         );
     }
@@ -500,6 +504,42 @@ function getLignesCommandes(PDO $bdd, array $idsCommandes): array
     }
 
     return $lignesParCommande;
+}
+
+function getStatutsCommande(PDO $bdd): array
+{
+    $requete = $bdd->query('SELECT id, libelle FROM statut ORDER BY id');
+
+    return $requete->fetchAll();
+}
+
+function modifierStatutCommande(PDO $bdd, int $idCommande, int $idStatut): bool
+{
+    $statutsAutorises = [
+        1 => 'en attente',
+        2 => 'validée',
+        3 => 'expédiée',
+        4 => 'refusée',
+    ];
+
+    $requeteStatut = $bdd->prepare('SELECT libelle FROM statut WHERE id = ? LIMIT 1');
+    $requeteStatut->execute([$idStatut]);
+    $libelleStatut = $requeteStatut->fetchColumn();
+
+    if (!isset($statutsAutorises[$idStatut]) || $libelleStatut !== $statutsAutorises[$idStatut]) {
+        throw new InvalidArgumentException('Le statut sélectionné est invalide.');
+    }
+
+    $requeteCommande = $bdd->prepare('SELECT id FROM commande WHERE id = ? LIMIT 1');
+    $requeteCommande->execute([$idCommande]);
+    if ($requeteCommande->fetchColumn() === false) {
+        return false;
+    }
+
+    $miseAJour = $bdd->prepare('UPDATE commande SET id_statut = ? WHERE id = ?');
+    $miseAJour->execute([$idStatut, $idCommande]);
+
+    return true;
 }
 
 function obtenirInformationsUtilisateur(PDO $bdd, string $email): ?array

@@ -30,6 +30,10 @@ des prix actuels du catalogue. Le client peut l’annuler tant qu’elle est « 
 ou « validée » ; l’annulation supprime la commande et ses lignes de la base. Elle n’est
 plus possible une fois la commande expédiée. Le paiement et la livraison ne sont pas inclus.
 
+Le rôle `gestionnaire` accède à `index.php?uc=gestionCommandes` pour consulter les commandes,
+les filtrer par statut et mettre à jour leur statut parmi les quatre valeurs de la table
+`statut`.
+
 ## Gestion du catalogue
 
 Un compte ayant le rôle `gestionnaire` peut ouvrir « Gestion catalogue » depuis la navigation
