@@ -78,15 +78,23 @@ $echapper = static function (string $valeur): string {
                                 : date('d/m/Y H:i', $timestamp);
                             ?>
                             <tr>
-                                <td>#<?= (int) $commande['id'] ?></td>
-                                <td>
+                                <td data-label="Commande">
+                                    <strong class="numero-commande">#<?= (int) $commande['id'] ?></strong>
+                                </td>
+                                <td data-label="Client">
                                     <?= $echapper(trim((string) $commande['prenom_client'] . ' ' . (string) $commande['nom_client'])) ?>
                                     <small><?= $echapper((string) $commande['email']) ?></small>
                                 </td>
-                                <td><?= $echapper($dateAffichee) ?></td>
-                                <td><?= number_format((float) $commande['total'], 2, ',', ' ') ?>&nbsp;€</td>
-                                <td><?= $echapper((string) $commande['statut']) ?></td>
-                                <td>
+                                <td data-label="Date"><?= $echapper($dateAffichee) ?></td>
+                                <td data-label="Montant">
+                                    <strong class="montant-commande">
+                                        <?= number_format((float) $commande['total'], 2, ',', ' ') ?>&nbsp;€
+                                    </strong>
+                                </td>
+                                <td data-label="Statut">
+                                    <span class="badge-statut-commande"><?= $echapper((string) $commande['statut']) ?></span>
+                                </td>
+                                <td data-label="Détail et mise à jour">
                                     <details class="detail-gestion-commande">
                                         <summary>Consulter</summary>
                                         <ul>

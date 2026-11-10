@@ -219,6 +219,40 @@ body {
   padding: clamp(40px, 7vw, 80px) 0;
 }
 
+.page-gestion .catalogue-entete,
+.catalogue .catalogue-entete,
+.page-panier .catalogue-entete {
+  max-width: none;
+  margin-bottom: 26px;
+  padding: 30px clamp(22px, 4vw, 40px);
+  border-radius: 5px;
+  background: var(--color-forest);
+  color: var(--color-cream);
+}
+
+.page-gestion .catalogue-entete .catalogue-sur-titre,
+.catalogue .catalogue-entete .catalogue-sur-titre,
+.page-panier .catalogue-entete .catalogue-sur-titre {
+  margin-bottom: 8px;
+  color: #d7c09d;
+}
+
+.page-gestion .catalogue-entete h1,
+.catalogue .catalogue-entete h1,
+.page-panier .catalogue-entete h1 {
+  margin-bottom: 10px;
+  color: var(--color-cream);
+  font-family: inherit;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 700;
+}
+
+.page-gestion .catalogue-entete > p:last-child,
+.catalogue .catalogue-entete > p:last-child,
+.page-panier .catalogue-entete > p:last-child {
+  color: #e4e0d6;
+}
+
 .formulaire-gestion {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
@@ -1096,7 +1130,7 @@ body {
 }
 
 .gestion-commandes {
-    width: min(100% - 40px, 1240px);
+    width: min(100% - 40px, 1320px);
     min-height: calc(100vh - 82px);
     margin: 0 auto;
     padding: 48px 0 72px;
@@ -1128,8 +1162,9 @@ body {
     margin-bottom: 20px;
     padding: 18px 20px;
     border: 1px solid var(--color-border);
-    border-radius: 5px;
+    border-radius: 8px;
     background: var(--color-paper);
+    box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
 }
 
 .filtre-commandes label,
@@ -1162,13 +1197,14 @@ body {
 .tableau-gestion-commandes-conteneur {
     overflow-x: auto;
     border: 1px solid var(--color-border);
-    border-radius: 5px;
+    border-radius: 8px;
     background: var(--color-paper);
+    box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
 }
 
 .tableau-gestion-commandes {
     width: 100%;
-    min-width: 960px;
+    min-width: 900px;
     border-collapse: collapse;
     text-align: left;
 }
@@ -1181,11 +1217,19 @@ body {
 }
 
 .tableau-gestion-commandes th {
+    position: sticky;
+    z-index: 1;
+    top: 0;
     background: #f3eee4;
     color: var(--color-bark-dark);
     font-size: 0.78rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tableau-gestion-commandes tbody tr {
+    transition: background-color 140ms ease;
 }
 
 .tableau-gestion-commandes tbody tr:last-child td {
@@ -1196,13 +1240,43 @@ body {
     background: #fcfaf6;
 }
 
+.tableau-gestion-commandes tbody tr:hover {
+    background: #f4f0e7;
+}
+
+.numero-commande {
+    color: var(--color-bark-dark);
+    white-space: nowrap;
+}
+
 .tableau-gestion-commandes td:nth-child(2) small {
     display: block;
     margin-top: 4px;
     color: var(--color-muted);
+    overflow-wrap: anywhere;
+}
+
+.montant-commande {
+    color: var(--color-forest);
+    white-space: nowrap;
+}
+
+.badge-statut-commande {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    padding: 4px 10px;
+    border: 1px solid #d8cbb5;
+    border-radius: 999px;
+    background: #f7f3eb;
+    color: var(--color-bark-dark);
+    font-size: 0.84rem;
+    font-weight: 650;
+    white-space: nowrap;
 }
 
 .detail-gestion-commande summary {
+    width: fit-content;
     color: var(--color-forest);
     cursor: pointer;
     font-weight: 650;
@@ -1212,10 +1286,17 @@ body {
 }
 
 .detail-gestion-commande ul {
-    min-width: 300px;
-    padding-left: 18px;
+    min-width: 280px;
+    margin: 12px 0;
+    padding: 12px 12px 12px 30px;
+    border-radius: 5px;
+    background: #f7f3eb;
     color: var(--color-muted);
     line-height: 1.6;
+}
+
+.detail-gestion-commande li + li {
+    margin-top: 6px;
 }
 
 .formulaire-statut-commande {
@@ -1257,6 +1338,88 @@ body {
 
     .filtre-commandes select,
     .filtre-commandes .bouton-inscription {
+        width: 100%;
+    }
+}
+
+@media (max-width: 760px) {
+    .tableau-gestion-commandes-conteneur {
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .tableau-gestion-commandes {
+        display: block;
+        min-width: 0;
+    }
+
+    .tableau-gestion-commandes thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+    }
+
+    .tableau-gestion-commandes tbody {
+        display: grid;
+        gap: 14px;
+    }
+
+    .tableau-gestion-commandes tbody tr,
+    .tableau-gestion-commandes tbody tr:nth-child(even) {
+        display: grid;
+        padding: 6px 16px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        background: var(--color-paper);
+        box-shadow: 0 8px 24px rgb(48 39 27 / 5%);
+    }
+
+    .tableau-gestion-commandes tbody tr:hover {
+        background: var(--color-paper);
+    }
+
+    .tableau-gestion-commandes tbody tr td,
+    .tableau-gestion-commandes tbody tr:last-child td {
+        display: grid;
+        grid-template-columns: minmax(88px, 0.38fr) minmax(0, 1fr);
+        align-items: start;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--color-border);
+        overflow-wrap: anywhere;
+    }
+
+    .tableau-gestion-commandes tbody tr td:last-child {
+        display: block;
+        border-bottom: 0;
+    }
+
+    .tableau-gestion-commandes tbody tr td:not(:last-child)::before {
+        content: attr(data-label);
+        color: var(--color-muted);
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .tableau-gestion-commandes td:nth-child(2) small {
+        grid-column: 2;
+        margin-top: -6px;
+    }
+
+    .detail-gestion-commande ul {
+        min-width: 0;
+    }
+
+    .formulaire-statut-commande select,
+    .formulaire-statut-commande .bouton-inscription {
         width: 100%;
     }
 }
